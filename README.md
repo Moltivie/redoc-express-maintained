@@ -71,7 +71,7 @@ MIT © [Aung Myo Kyaw](https://github.com/AungMyoKyaw)
 [contri]: https://img.shields.io/badge/contributions-welcome-brightgreen.svg
 [contri-url]: https://github.com/AungMyoKyaw/redoc-express/issues
 [azure]: https://dev.azure.com/AungMyoKyaw/redoc-express/_apis/build/status/redoc-express?branchName=master
-[azure-url]: https://dev.azure.com/AungMyoKyaw/redoc-express/_build/latest?definitionId=1&branchName=master
+[azure-url]: https://dev.azure.com/AungMyoKyaw/redoc-express/_build/latest?definitionId=4&branchName=master
 [npm-download]: https://img.shields.io/npm/dt/redoc-express.svg
 [npm-dl-url]: https://www.npmjs.com/package/redoc-express
 [license]: https://img.shields.io/badge/License-MIT-brightgreen.svg
