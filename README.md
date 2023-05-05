@@ -37,7 +37,8 @@ app.get(
   '/docs',
   redoc({
     title: 'API Docs',
-    specUrl: '/docs/swagger.json'
+    specUrl: '/docs/swagger.json',
+    nonce:'' // <= it is optional,we can omit this key and value
   })
 );
 

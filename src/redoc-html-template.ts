@@ -1,6 +1,7 @@
 export interface Ioption {
   title: string;
   specUrl: string;
+  nonce?: string;
 }
 
 const html = `<!DOCTYPE html>
@@ -19,7 +20,7 @@ const html = `<!DOCTYPE html>
   </head>
   <body>
     <redoc spec-url='[[spec-url]]'></redoc>
-    <script src="https://unpkg.com/redoc@latest/bundles/redoc.standalone.js"> </script>
+    <script nonce='[[nonce]]' src="https://unpkg.com/redoc@latest/bundles/redoc.standalone.js"> </script>
   </body>
 </html>`;
 
@@ -29,8 +30,11 @@ function redocHtml(
     specUrl: 'http://petstore.swagger.io/v2/swagger.json'
   }
 ): string {
-  const { title, specUrl } = options;
-  return html.replace('[[title]]', title).replace('[[spec-url]]', specUrl);
+  const { title, specUrl, nonce = '' } = options;
+  return html
+    .replace('[[title]]', title)
+    .replace('[[spec-url]]', specUrl)
+    .replace('[[nonce]]', nonce);
 }
 
 export { redocHtml };
