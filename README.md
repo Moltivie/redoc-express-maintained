@@ -2,7 +2,6 @@
 
 > Express Middleware for OpenAPI/Swagger-generated API Reference Documentation
 
-[![Build Status][azure]][azure-url]
 [![code style: prettier][prettier]][prettier-url]
 [![npm][npm-download]][npm-dl-url]
 [![contributions welcome][contri]][contri-url]
@@ -68,15 +67,13 @@ npm t
 MIT © [Aung Myo Kyaw](https://github.com/AungMyoKyaw)
 
 [redoc-express]: https://github.com/AungMyoKyaw/redoc-express
-[contri]: https://img.shields.io/badge/contributions-welcome-brightgreen.svg
+[contri]: https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat-square
 [contri-url]: https://github.com/AungMyoKyaw/redoc-express/issues
-[azure]: https://dev.azure.com/AungMyoKyaw/redoc-express/_apis/build/status/redoc-express?branchName=master
-[azure-url]: https://dev.azure.com/AungMyoKyaw/redoc-express/_build/latest?definitionId=4&branchName=master
-[npm-download]: https://img.shields.io/npm/dt/redoc-express.svg
+[npm-download]: https://img.shields.io/npm/dt/redoc-express.svg?style=flat-square
 [npm-dl-url]: https://www.npmjs.com/package/redoc-express
-[license]: https://img.shields.io/badge/License-MIT-brightgreen.svg
+[license]: https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat-square
 [license-url]: https://opensource.org/licenses/MIT
-[prettier]: https://img.shields.io/badge/code_style-prettier-ff69b4.svg
+[prettier]: https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square
 [prettier-url]: https://github.com/prettier/prettier
 [redoc-url]: https://github.com/Redocly/redoc
 [live-demo-url]: http://redocly.github.io/redoc/
