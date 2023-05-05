@@ -30,11 +30,11 @@ function redocHtml(
     specUrl: 'http://petstore.swagger.io/v2/swagger.json'
   }
 ): string {
-  const { title, specUrl, nonce="" } = options;
+  const { title, specUrl, nonce = '' } = options;
   return html
     .replace('[[title]]', title)
     .replace('[[spec-url]]', specUrl)
-    .replace('[[nonce]]', nonce)
+    .replace('[[nonce]]', nonce);
 }
 
 export { redocHtml };
