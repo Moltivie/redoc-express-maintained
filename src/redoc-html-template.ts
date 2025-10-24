@@ -21,7 +21,7 @@ const html = `<!DOCTYPE html>
   </head>
   <body>
     <div id="redoc-container"></div>
-    <script nonce='[[nonce]]' src="https://unpkg.com/redoc@latest/bundles/redoc.standalone.js"> </script>
+    <script nonce='[[nonce]]' src="https://unpkg.com/redoc@^2.5.2/bundles/redoc.standalone.js"> </script>
   </body>
   <script>
     Redoc.init(
