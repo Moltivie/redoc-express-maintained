@@ -10,10 +10,13 @@ Express middleware for serving OpenAPI/Swagger documentation using ReDoc.
 
 This is a community-maintained fork of [redoc-express](https://github.com/AungMyoKyaw/redoc-express) by Aung Myo Kyaw. This version addresses compatibility issues and provides ongoing maintenance for modern Node.js and Express environments.
 
+**ReDoc Version:** 2.5.2 (locked for stability - new versions released after testing)
+
 Key improvements:
-- Fixed ReDoc version pinning for stability
+- ReDoc version locked to prevent unexpected breaking changes
 - Maintained compatibility with current Node.js and Express versions
 - Active issue resolution and community support
+- Tested releases when upgrading ReDoc versions
 
 ## Install
 
