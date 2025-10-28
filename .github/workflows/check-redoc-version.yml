@@ -1,0 +1,107 @@
+name: Check ReDoc Version
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Every Sunday at midnight UTC
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Get current ReDoc version
+        id: current
+        run: |
+          CURRENT=$(grep -oP '@\K[0-9]+\.[0-9]+\.[0-9]+' src/redoc-html-template.ts | head -1)
+          echo "version=$CURRENT" >> $GITHUB_OUTPUT
+          echo "Current version: $CURRENT"
+      
+      - name: Get latest stable ReDoc version
+        id: latest
+        run: |
+          # Get all versions, filter stable only (no -rc, -beta, -alpha, -canary)
+          LATEST=$(npm view redoc versions --json | \
+            jq -r '.[]' | \
+            grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | \
+            tail -1)
+          echo "version=$LATEST" >> $GITHUB_OUTPUT
+          echo "Latest stable version: $LATEST"
+      
+      - name: Compare versions
+        id: compare
+        run: |
+          CURRENT="${{ steps.current.outputs.version }}"
+          LATEST="${{ steps.latest.outputs.version }}"
+          
+          if [ "$CURRENT" != "$LATEST" ]; then
+            echo "New stable version available!"
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+          else
+            echo "Already on latest stable version"
+            echo "needs_update=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create Issue for Update
+        if: steps.compare.outputs.needs_update == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const current = '${{ steps.current.outputs.version }}';
+            const latest = '${{ steps.latest.outputs.version }}';
+            
+            // Check if issue already exists
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['redoc-update']
+            });
+            
+            const existingIssue = issues.data.find(issue => 
+              issue.title.includes(`ReDoc ${latest}`)
+            );
+            
+            if (existingIssue) {
+              console.log('Issue already exists:', existingIssue.html_url);
+              return;
+            }
+            
+            // Create new issue
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Update ReDoc to version ${latest}`,
+              labels: ['redoc-update', 'dependencies'],
+              body: `A new stable version of ReDoc is available.
+
+            **Current version:** ${current}
+            **Latest stable version:** ${latest}
+
+            ## Action Required
+
+            1. Review ReDoc [release notes](https://github.com/Redocly/redoc/releases/tag/v${latest})
+            2. Update version in \`src/redoc-html-template.ts\`
+            3. Update tests in \`tests/redoc-express.spec.ts\`
+            4. Run tests: \`npm test\`
+            5. Build: \`npm run build\`
+            6. Test manually if needed
+            7. Bump package version
+            8. Create release
+
+            ## Files to Update
+
+            - [ ] \`src/redoc-html-template.ts\` (line 24)
+            - [ ] \`tests/redoc-express.spec.ts\` (lines 20, 56, 93)
+            - [ ] Run \`npm test\` and \`npm run build\`
+            - [ ] Update \`README.md\` if needed
+            - [ ] Bump version: \`npm version patch\` or \`npm version minor\`
+            `
+            });
+
