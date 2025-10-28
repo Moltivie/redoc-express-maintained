@@ -2,27 +2,27 @@ name: Check ReDoc Version
 
 on:
   schedule:
-    - cron: '0 0 * * 0'  # Every Sunday at midnight UTC
-  workflow_dispatch:  # Allow manual trigger
+    - cron: '0 0 * * 0' # Every Sunday at midnight UTC
+  workflow_dispatch: # Allow manual trigger
 
 jobs:
   check-version:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      
+
       - name: Get current ReDoc version
         id: current
         run: |
           CURRENT=$(grep -oP '@\K[0-9]+\.[0-9]+\.[0-9]+' src/redoc-html-template.ts | head -1)
           echo "version=$CURRENT" >> $GITHUB_OUTPUT
           echo "Current version: $CURRENT"
-      
+
       - name: Get latest stable ReDoc version
         id: latest
         run: |
@@ -33,13 +33,13 @@ jobs:
             tail -1)
           echo "version=$LATEST" >> $GITHUB_OUTPUT
           echo "Latest stable version: $LATEST"
-      
+
       - name: Compare versions
         id: compare
         run: |
           CURRENT="${{ steps.current.outputs.version }}"
           LATEST="${{ steps.latest.outputs.version }}"
-          
+
           if [ "$CURRENT" != "$LATEST" ]; then
             echo "New stable version available!"
             echo "needs_update=true" >> $GITHUB_OUTPUT
@@ -47,7 +47,7 @@ jobs:
             echo "Already on latest stable version"
             echo "needs_update=false" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Create Issue for Update
         if: steps.compare.outputs.needs_update == 'true'
         uses: actions/github-script@v7
@@ -55,7 +55,7 @@ jobs:
           script: |
             const current = '${{ steps.current.outputs.version }}';
             const latest = '${{ steps.latest.outputs.version }}';
-            
+
             // Check if issue already exists
             const issues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
@@ -63,16 +63,16 @@ jobs:
               state: 'open',
               labels: ['redoc-update']
             });
-            
+
             const existingIssue = issues.data.find(issue => 
               issue.title.includes(`ReDoc ${latest}`)
             );
-            
+
             if (existingIssue) {
               console.log('Issue already exists:', existingIssue.html_url);
               return;
             }
-            
+
             // Create new issue
             await github.rest.issues.create({
               owner: context.repo.owner,
@@ -104,4 +104,3 @@ jobs:
             - [ ] Bump version: \`npm version patch\` or \`npm version minor\`
             `
             });
-
