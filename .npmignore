@@ -17,7 +17,6 @@ jest.config.js
 .editorconfig
 
 # Development files
-PLANNING.md
 tsconfig.json
 
 # Source files (we ship dist/ instead)
