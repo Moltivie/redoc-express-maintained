@@ -12,6 +12,7 @@ jest.config.js
 
 # Configuration files
 .eslintrc.js
+.eslintignore
 .prettierrc
 .editorconfig
 
