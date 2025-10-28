@@ -1,7 +1,8 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: './tsconfig.json'
+    ecmaVersion: 2018,
+    sourceType: 'module'
   },
   env: {
     browser: true,
@@ -13,15 +14,14 @@ module.exports = {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly'
   },
-  parserOptions: {
-    ecmaVersion: 2018,
-    sourceType: 'module'
-  },
   rules: {
     'comma-dangle': 'off',
     quotes: 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     'arrow-parens': 'off',
-    'import/no-unresolved': 'off'
+    'import/no-unresolved': 'off',
+    'import/extensions': 'off',
+    'import/no-import-module-exports': 'off',
+    'object-curly-newline': 'off'
   }
 };
