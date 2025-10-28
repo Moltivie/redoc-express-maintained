@@ -1,0 +1,24 @@
+# Git files
+.git
+.github
+.gitignore
+
+# Dependencies
+node_modules
+
+# Tests
+tests
+jest.config.js
+
+# Configuration files
+.eslintrc.js
+.prettierrc
+.editorconfig
+
+# Development files
+PLANNING.md
+tsconfig.json
+
+# Source files (we ship dist/ instead)
+src
+

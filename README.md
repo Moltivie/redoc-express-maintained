@@ -1,104 +1,120 @@
-# [redoc-express][redoc-express]
+# redoc-express-maintained
 
-> Express Middleware for OpenAPI/Swagger-generated API Reference Documentation
+Express middleware for serving OpenAPI/Swagger documentation using ReDoc.
 
-[![code style: prettier][prettier]][prettier-url]
 [![npm][npm-download]][npm-dl-url]
-[![contributions welcome][contri]][contri-url]
 [![License: MIT][license]][license-url]
+[![code style: prettier][prettier]][prettier-url]
 
-## Demo
+## About
 
-- [Live Demo][live-demo-url]
+This is a community-maintained fork of [redoc-express](https://github.com/AungMyoKyaw/redoc-express) by Aung Myo Kyaw. This version addresses compatibility issues and provides ongoing maintenance for modern Node.js and Express environments.
+
+Key improvements:
+- Fixed ReDoc version pinning for stability
+- Maintained compatibility with current Node.js and Express versions
+- Active issue resolution and community support
 
 ## Install
 
 ```shell
-npm install redoc-express
+npm install redoc-express-maintained
 ```
 
 ## Usage
 
+### Basic Usage
+
 ```javascript
 const express = require('express');
-const redoc = require('redoc-express');
+const redoc = require('redoc-express-maintained');
 
 const app = express();
-const port = 3000;
 
-// serve your swagger.json file
 app.get('/docs/swagger.json', (req, res) => {
   res.sendFile('swagger.json', { root: '.' });
 });
 
-// define title and specUrl location
-// serve redoc
-app.get(
-  '/docs',
-  redoc({
-    title: 'API Docs',
-    specUrl: '/docs/swagger.json',
-    nonce: '', // <= it is optional,we can omit this key and value
-    // we are now start supporting the redocOptions object
-    // you can omit the options object if you don't need it
-    // https://redocly.com/docs/api-reference-docs/configuration/functionality/
-    redocOptions: {
-      theme: {
-        colors: {
-          primary: {
-            main: '#6EC5AB'
-          }
-        },
-        typography: {
-          fontFamily: `"museo-sans", 'Helvetica Neue', Helvetica, Arial, sans-serif`,
-          fontSize: '15px',
-          lineHeight: '1.5',
-          code: {
-            code: '#87E8C7',
-            backgroundColor: '#4D4D4E'
-          }
-        },
-        menu: {
-          backgroundColor: '#ffffff'
+app.get('/docs', redoc({
+  title: 'API Documentation',
+  specUrl: '/docs/swagger.json'
+}));
+
+app.listen(3000);
+```
+
+### Advanced Configuration
+
+```javascript
+app.get('/docs', redoc({
+  title: 'API Documentation',
+  specUrl: '/docs/swagger.json',
+  nonce: '', // Optional CSP nonce
+  redocOptions: {
+    theme: {
+      colors: {
+        primary: {
+          main: '#6EC5AB'
         }
+      },
+      typography: {
+        fontFamily: '"museo-sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+        fontSize: '15px',
+        lineHeight: '1.5',
+        code: {
+          code: '#87E8C7',
+          backgroundColor: '#4D4D4E'
+        }
+      },
+      menu: {
+        backgroundColor: '#ffffff'
       }
     }
-  })
-);
-
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+  }
+}));
 ```
+
+For more configuration options, see the [ReDoc documentation](https://redocly.com/docs/api-reference-docs/configuration/functionality/).
 
 ## Development
 
-### Install Dependencies
+Install dependencies:
 
 ```shell
-npm i
+npm install
 ```
 
-### Run Test
+Run tests:
 
 ```shell
-npm t
+npm test
 ```
 
-## Check ReDoc Project for more INFO
+Build:
 
-- [redoc][redoc-url]
+```shell
+npm run build
+```
+
+## Resources
+
+- [ReDoc Project](https://github.com/Redocly/redoc)
+- [ReDoc Demo](http://redocly.github.io/redoc/)
+- [Original Repository](https://github.com/AungMyoKyaw/redoc-express)
+
+## Contributing
+
+Contributions are welcome. Please open an issue or submit a pull request on [GitHub](https://github.com/Moltivie/redoc-express-maintained).
 
 ## License
 
-MIT © [Aung Myo Kyaw](https://github.com/AungMyoKyaw)
+MIT - See [LICENSE](LICENSE) file for details.
 
-[redoc-express]: https://github.com/AungMyoKyaw/redoc-express
-[contri]: https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat-square
-[contri-url]: https://github.com/AungMyoKyaw/redoc-express/issues
-[npm-download]: https://img.shields.io/npm/dt/redoc-express.svg?style=flat-square
-[npm-dl-url]: https://www.npmjs.com/package/redoc-express
+Original work by [Aung Myo Kyaw](https://github.com/AungMyoKyaw)
+
+[npm-download]: https://img.shields.io/npm/dt/redoc-express-maintained.svg?style=flat-square
+[npm-dl-url]: https://www.npmjs.com/package/redoc-express-maintained
 [license]: https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat-square
 [license-url]: https://opensource.org/licenses/MIT
 [prettier]: https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square
 [prettier-url]: https://github.com/prettier/prettier
-[redoc-url]: https://github.com/Redocly/redoc
-[live-demo-url]: http://redocly.github.io/redoc/

@@ -17,7 +17,7 @@ test('should return redocHtml Template', async () => {
   </head>
   <body>
     <div id="redoc-container"></div>
-    <script nonce='' src="https://unpkg.com/redoc@latest/bundles/redoc.standalone.js"> </script>
+    <script nonce='' src="https://unpkg.com/redoc@^2.5.2/bundles/redoc.standalone.js"> </script>
   </body>
   <script>
     Redoc.init(
@@ -53,7 +53,7 @@ test('should return redocHtml Template [nonce]', async () => {
   </head>
   <body>
     <div id="redoc-container"></div>
-    <script nonce='rAnd0m' src="https://unpkg.com/redoc@latest/bundles/redoc.standalone.js"> </script>
+    <script nonce='rAnd0m' src="https://unpkg.com/redoc@^2.5.2/bundles/redoc.standalone.js"> </script>
   </body>
   <script>
     Redoc.init(
@@ -90,7 +90,7 @@ test('should return redocHtml Template [redoc options]', async () => {
   </head>
   <body>
     <div id="redoc-container"></div>
-    <script nonce='rAnd0m' src="https://unpkg.com/redoc@latest/bundles/redoc.standalone.js"> </script>
+    <script nonce='rAnd0m' src="https://unpkg.com/redoc@^2.5.2/bundles/redoc.standalone.js"> </script>
   </body>
   <script>
     Redoc.init(
@@ -114,7 +114,7 @@ test('should return redocHtml Template [redoc options]', async () => {
             }
           },
           typography: {
-            fontFamily: `"museo-sans", 'Helvetica Neue', Helvetica, Arial, sans-serif`,
+            fontFamily: `"museo-sans", 'Helvetica Neue', Helvetica, Arial, sans-serif`
           }
         }
       }

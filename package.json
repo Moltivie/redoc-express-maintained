@@ -1,7 +1,7 @@
 {
-  "name": "redoc-express",
-  "version": "2.1.0",
-  "description": "Express Middleware for OpenAPI/Swagger-generated API Reference Documentation",
+  "name": "redoc-express-maintained",
+  "version": "1.0.0",
+  "description": "Community-maintained fork of redoc-express. Express middleware for OpenAPI/Swagger documentation with compatibility fixes.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -16,17 +16,23 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AungMyoKyaw/redoc-express.git"
+    "url": "git+https://github.com/Moltivie/redoc-express-maintained.git"
   },
   "keywords": [
     "redoc-swagger-ui-express-middleware"
   ],
-  "author": "Aung Myo Kyaw",
+  "author": "Moltivie",
+  "contributors": [
+    "Aung Myo Kyaw (original author)",
+    "Muhammed Tanrikulu (contributor)",
+    "Aaron Hipple (contributor)",
+    "Moltivie (maintainer)"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/AungMyoKyaw/redoc-express/issues"
+    "url": "https://github.com/Moltivie/redoc-express-maintained/issues"
   },
-  "homepage": "https://github.com/AungMyoKyaw/redoc-express#readme",
+  "homepage": "https://github.com/Moltivie/redoc-express-maintained#readme",
   "devDependencies": {
     "@types/jest": "^29.5.1",
     "@types/node": "^20.0.0",
