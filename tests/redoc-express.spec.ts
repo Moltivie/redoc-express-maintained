@@ -29,7 +29,7 @@ test('should return redocHtml Template', async () => {
 </html>`;
 
   expect(
-    redocHtml({
+    await redocHtml({
       title: 'ReDoc',
       specUrl: 'http://petstore.swagger.io/v2/swagger.json'
     })
@@ -65,7 +65,7 @@ test('should return redocHtml Template [nonce]', async () => {
 </html>`;
 
   expect(
-    redocHtml({
+    await redocHtml({
       title: 'ReDoc',
       specUrl: 'http://petstore.swagger.io/v2/swagger.json',
       nonce: 'rAnd0m'
@@ -102,7 +102,7 @@ test('should return redocHtml Template [redoc options]', async () => {
 </html>`;
 
   expect(
-    redocHtml({
+    await redocHtml({
       title: 'ReDoc',
       specUrl: 'http://petstore.swagger.io/v2/swagger.json',
       nonce: 'rAnd0m',

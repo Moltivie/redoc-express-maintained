@@ -1,8 +1,12 @@
+import { executeAfterRenderHooks, executeBeforeRenderHooks } from './hooks';
+import { Plugin, RedocOptions } from './types/plugin';
+
 export interface Ioption {
   title: string;
   specUrl: string;
   nonce?: string;
   redocOptions?: object;
+  plugins?: Plugin[];
 }
 
 const html = `<!DOCTYPE html>
@@ -32,7 +36,48 @@ const html = `<!DOCTYPE html>
   </script>
 </html>`;
 
-function redocHtml(
+async function redocHtml(
+  options: Ioption = {
+    title: 'ReDoc',
+    specUrl: 'http://petstore.swagger.io/v2/swagger.json'
+  }
+): Promise<string> {
+  const {
+    title,
+    specUrl,
+    nonce = '',
+    redocOptions = {},
+    plugins = []
+  } = options;
+
+  let renderedHtml = html
+    .replace('[[title]]', title)
+    .replace('[[spec-url]]', specUrl)
+    .replace('[[nonce]]', nonce)
+    .replace('[[options]]', JSON.stringify(redocOptions));
+
+  // Execute beforeRender hooks
+  if (plugins.length > 0) {
+    renderedHtml = await executeBeforeRenderHooks(
+      renderedHtml,
+      options as RedocOptions,
+      plugins
+    );
+  }
+
+  // Execute afterRender hooks
+  if (plugins.length > 0) {
+    renderedHtml = await executeAfterRenderHooks(renderedHtml, plugins);
+  }
+
+  return renderedHtml;
+}
+
+/**
+ * Synchronous version for backward compatibility
+ * @deprecated Use redocHtml (async version) instead
+ */
+function redocHtmlSync(
   options: Ioption = {
     title: 'ReDoc',
     specUrl: 'http://petstore.swagger.io/v2/swagger.json'
@@ -46,5 +91,5 @@ function redocHtml(
     .replace('[[options]]', JSON.stringify(redocOptions));
 }
 
-export { redocHtml };
+export { redocHtml, redocHtmlSync };
 export default redocHtml;
