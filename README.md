@@ -17,6 +17,7 @@ Key improvements:
 - Maintained compatibility with current Node.js and Express versions
 - Active issue resolution and community support
 - Tested releases when upgrading ReDoc versions
+- **NEW:** Extensible plugin system with built-in auth, cache, and metrics plugins
 
 ## Install
 
@@ -79,6 +80,90 @@ app.get('/docs', redoc({
 
 For more configuration options, see the [ReDoc documentation](https://redocly.com/docs/api-reference-docs/configuration/functionality/).
 
+### Plugin System
+
+**NEW in v2.x:** `redoc-express-maintained` now includes a powerful plugin system to extend functionality!
+
+#### Built-in Plugins
+
+**Authentication Plugin**
+```javascript
+const { authPlugin } = require('redoc-express-maintained');
+
+app.get('/docs', redoc({
+  title: 'API Documentation',
+  specUrl: '/docs/swagger.json',
+  plugins: [
+    authPlugin({
+      type: 'basic',
+      username: 'admin',
+      password: 'secret'
+    })
+  ]
+}));
+```
+
+**Cache Plugin**
+```javascript
+const { cachePlugin } = require('redoc-express-maintained');
+
+app.get('/docs', redoc({
+  title: 'API Documentation',
+  specUrl: '/docs/swagger.json',
+  plugins: [
+    cachePlugin({
+      ttl: 3600, // 1 hour
+      maxSize: 100
+    })
+  ]
+}));
+```
+
+**Metrics Plugin**
+```javascript
+const { metricsPlugin } = require('redoc-express-maintained');
+
+app.get('/docs', redoc({
+  title: 'API Documentation',
+  specUrl: '/docs/swagger.json',
+  plugins: [
+    metricsPlugin({
+      endpoint: '/docs/metrics',
+      enablePrometheus: true
+    })
+  ]
+}));
+```
+
+#### Creating Custom Plugins
+
+```javascript
+const { createPlugin } = require('redoc-express-maintained');
+
+const myPlugin = createPlugin({
+  name: 'my-custom-plugin',
+  version: '1.0.0',
+  hooks: {
+    onRequest: (req, res, next) => {
+      // Custom logic before rendering
+      next();
+    },
+    afterRender: (html) => {
+      // Modify the HTML output
+      return html;
+    }
+  }
+});
+
+app.get('/docs', redoc({
+  title: 'API Documentation',
+  specUrl: '/docs/swagger.json',
+  plugins: [myPlugin]
+}));
+```
+
+**📚 For comprehensive plugin documentation, examples, and advanced usage, visit our [Wiki](https://github.com/Moltivie/redoc-express-maintained/wiki)!**
+
 ## Development
 
 Install dependencies:
@@ -101,6 +186,7 @@ npm run build
 
 ## Resources
 
+- [📚 Wiki & Documentation](https://github.com/Moltivie/redoc-express-maintained/wiki) - Complete guides, examples, and API reference
 - [ReDoc Project](https://github.com/Redocly/redoc)
 - [ReDoc Demo](http://redocly.github.io/redoc/)
 - [Original Repository](https://github.com/AungMyoKyaw/redoc-express)
