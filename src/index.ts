@@ -88,11 +88,15 @@ export type { AuthPluginOptions, CachePluginOptions, Metric, MetricsPluginOption
 // Default export
 export default redocExpressMiddleware;
 
+// Named export for better ESM compatibility
+export { redocExpressMiddleware };
+
 // CommonJS compatibility
 // TypeScript will compile this properly for CommonJS output
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = redocExpressMiddleware;
   module.exports.default = redocExpressMiddleware;
+  module.exports.redocExpressMiddleware = redocExpressMiddleware;
   module.exports.createPlugin = createPlugin;
   module.exports.createPluginFactory = createPluginFactory;
   module.exports.redocHtml = redocHtml;
