@@ -42,13 +42,7 @@ async function redocHtml(
     specUrl: 'http://petstore.swagger.io/v2/swagger.json'
   }
 ): Promise<string> {
-  const {
-    title,
-    specUrl,
-    nonce = '',
-    redocOptions = {},
-    plugins = []
-  } = options;
+  const { title, specUrl, nonce = '', redocOptions = {}, plugins = [] } = options;
 
   let renderedHtml = html
     .replace('[[title]]', title)
@@ -58,11 +52,7 @@ async function redocHtml(
 
   // Execute beforeRender hooks
   if (plugins.length > 0) {
-    renderedHtml = await executeBeforeRenderHooks(
-      renderedHtml,
-      options as RedocOptions,
-      plugins
-    );
+    renderedHtml = await executeBeforeRenderHooks(renderedHtml, options as RedocOptions, plugins);
   }
 
   // Execute afterRender hooks

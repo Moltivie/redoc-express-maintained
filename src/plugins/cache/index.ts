@@ -16,10 +16,7 @@ export interface CachePluginOptions {
  * Simple in-memory cache implementation
  */
 class HtmlCache {
-  private cache: Map<
-    string,
-    { html: string; timestamp: number; size: number }
-  > = new Map();
+  private cache: Map<string, { html: string; timestamp: number; size: number }> = new Map();
 
   private ttl: number;
 

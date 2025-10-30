@@ -78,9 +78,7 @@ function createSilentLogger(): Logger {
 
 // Export default logger instance
 const isTestEnvironment = process.env.NODE_ENV === 'test';
-export const logger: Logger = isTestEnvironment
-  ? createSilentLogger()
-  : createConsoleLogger();
+export const logger: Logger = isTestEnvironment ? createSilentLogger() : createConsoleLogger();
 
 /**
  * Create a custom logger instance

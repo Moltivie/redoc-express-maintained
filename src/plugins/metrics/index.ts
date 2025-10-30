@@ -61,8 +61,7 @@ class MetricsCollector {
 
   getStats() {
     const totalRequests = this.metrics.length;
-    const avgResponseTime = this.metrics.reduce((sum, m) => sum + (m.responseTime || 0), 0)
-        / totalRequests || 0;
+    const avgResponseTime = this.metrics.reduce((sum, m) => sum + (m.responseTime || 0), 0) / totalRequests || 0;
 
     const methodCounts = this.metrics.reduce((acc, m) => {
       acc[m.method] = (acc[m.method] || 0) + 1;
@@ -120,9 +119,7 @@ export function metricsPlugin(options: MetricsPluginOptions = {}): Plugin {
           collector.addMetric(metric);
 
           if (logToConsole) {
-            logger.info(
-              `[Metrics] ${metric.method} ${metric.url} - ${metric.responseTime}ms - ${metric.userAgent}`
-            );
+            logger.info(`[Metrics] ${metric.method} ${metric.url} - ${metric.responseTime}ms - ${metric.userAgent}`);
           }
 
           if (onMetric) {

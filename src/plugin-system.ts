@@ -88,9 +88,7 @@ class PluginRegistry {
    * @returns Array of plugins that implement the specified hook
    */
   getPluginsWithHook(hookName: keyof Plugin['hooks']): Plugin[] {
-    return this.getAll().filter(
-      (plugin) => plugin.hooks[hookName] !== undefined
-    );
+    return this.getAll().filter((plugin) => plugin.hooks[hookName] !== undefined);
   }
 }
 

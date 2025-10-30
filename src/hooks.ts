@@ -22,10 +22,7 @@ export async function executeBeforeRenderHooks(
         return await plugin.hooks.beforeRender(currentHtml, options);
       } catch (error) {
         // Continue with other plugins even if one fails
-        logger.error(
-          `[Plugin: ${plugin.name}] Error in beforeRender hook:`,
-          error
-        );
+        logger.error(`[Plugin: ${plugin.name}] Error in beforeRender hook:`, error);
         return currentHtml;
       }
     }
@@ -41,10 +38,7 @@ export async function executeBeforeRenderHooks(
  * @param plugins - Array of plugins to execute
  * @returns Modified HTML string
  */
-export async function executeAfterRenderHooks(
-  html: string,
-  plugins: Plugin[]
-): Promise<string> {
+export async function executeAfterRenderHooks(html: string, plugins: Plugin[]): Promise<string> {
   // Process plugins sequentially using reduce to avoid linting issues
   const result = await plugins.reduce(async (previousPromise, plugin) => {
     const currentHtml = await previousPromise;
@@ -53,10 +47,7 @@ export async function executeAfterRenderHooks(
         return await plugin.hooks.afterRender(currentHtml);
       } catch (error) {
         // Continue with other plugins even if one fails
-        logger.error(
-          `[Plugin: ${plugin.name}] Error in afterRender hook:`,
-          error
-        );
+        logger.error(`[Plugin: ${plugin.name}] Error in afterRender hook:`, error);
         return currentHtml;
       }
     }
@@ -69,11 +60,7 @@ export async function executeAfterRenderHooks(
 /**
  * Executes a single onRequest hook wrapped in a promise
  */
-function executeOnRequestHook(
-  plugin: Plugin,
-  req: Request,
-  res: Response
-): Promise<void> {
+function executeOnRequestHook(plugin: Plugin, req: Request, res: Response): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     if (plugin.hooks.onRequest) {
       plugin.hooks.onRequest(req, res, (err?: any) => {
@@ -95,11 +82,7 @@ function executeOnRequestHook(
  * @returns Express middleware function
  */
 export function createOnRequestMiddleware(plugins: Plugin[]) {
-  return async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       // Execute all onRequest hooks in sequence using reduce
       await plugins.reduce(async (previousPromise, plugin) => {
@@ -116,12 +99,7 @@ export function createOnRequestMiddleware(plugins: Plugin[]) {
 /**
  * Executes a single onError hook wrapped in a promise
  */
-function executeOnErrorHook(
-  plugin: Plugin,
-  error: Error,
-  req: Request,
-  res: Response
-): Promise<void> {
+function executeOnErrorHook(plugin: Plugin, error: Error, req: Request, res: Response): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     if (plugin.hooks.onError) {
       plugin.hooks.onError(error, req, res, (err?: any) => {
@@ -143,22 +121,14 @@ function executeOnErrorHook(
  * @returns Express error handler middleware function
  */
 export function createOnErrorMiddleware(plugins: Plugin[]) {
-  return async (
-    error: Error,
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  return async (error: Error, req: Request, res: Response, next: NextFunction): Promise<void> => {
     // Execute all onError hooks using reduce
     await plugins.reduce(async (previousPromise, plugin) => {
       await previousPromise;
       try {
         return executeOnErrorHook(plugin, error, req, res);
       } catch (hookError) {
-        logger.error(
-          `[Plugin: ${plugin.name}] Error in onError hook:`,
-          hookError
-        );
+        logger.error(`[Plugin: ${plugin.name}] Error in onError hook:`, hookError);
         return Promise.resolve();
       }
     }, Promise.resolve());

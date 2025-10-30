@@ -17,10 +17,7 @@ export interface RedocOptions {
  * @param options - The redoc options being used
  * @returns Modified HTML string or Promise of HTML string
  */
-export type BeforeRenderHook = (
-  html: string,
-  options: RedocOptions
-) => string | Promise<string>;
+export type BeforeRenderHook = (html: string, options: RedocOptions) => string | Promise<string>;
 
 /**
  * Hook function that runs after HTML rendering
@@ -35,11 +32,7 @@ export type AfterRenderHook = (html: string) => string | Promise<string>;
  * @param res - Express response object
  * @param next - Express next function
  */
-export type OnRequestHook = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => void | Promise<void>;
+export type OnRequestHook = (req: Request, res: Response, next: NextFunction) => void | Promise<void>;
 
 /**
  * Hook function that runs when an error occurs
@@ -48,12 +41,7 @@ export type OnRequestHook = (
  * @param res - Express response object
  * @param next - Express next function
  */
-export type OnErrorHook = (
-  error: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => void | Promise<void>;
+export type OnErrorHook = (error: Error, req: Request, res: Response, next: NextFunction) => void | Promise<void>;
 
 /**
  * Collection of all available hooks
