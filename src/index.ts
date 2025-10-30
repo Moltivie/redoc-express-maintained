@@ -1,8 +1,11 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express';
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { createOnRequestMiddleware } from './hooks';
 import { createPlugin, createPluginFactory } from './plugin-system';
-import { Ioption, redocHtml } from './redoc-html-template';
-import { Plugin } from './types/plugin';
+import type { Ioption } from './redoc-html-template';
+import { redocHtml } from './redoc-html-template';
+import type { Plugin } from './types/plugin';
+// Import plugins namespace once to avoid dynamic require in CJS compatibility block
+import * as cjsPlugins from './plugins';
 
 /**
  * Extended options interface for redoc-express middleware
@@ -95,8 +98,6 @@ export default redocExpressMiddleware;
 // CommonJS compatibility
 // TypeScript will compile this properly for CommonJS output
 if (typeof module !== 'undefined' && module.exports) {
-  const plugins = require('./plugins');
-
   module.exports = redocExpressMiddleware;
   module.exports.default = redocExpressMiddleware;
   module.exports.createPlugin = createPlugin;
@@ -104,7 +105,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports.redocHtml = redocHtml;
 
   // Export plugins for CommonJS
-  module.exports.authPlugin = plugins.authPlugin;
-  module.exports.cachePlugin = plugins.cachePlugin;
-  module.exports.metricsPlugin = plugins.metricsPlugin;
+  module.exports.authPlugin = cjsPlugins.authPlugin;
+  module.exports.cachePlugin = cjsPlugins.cachePlugin;
+  module.exports.metricsPlugin = cjsPlugins.metricsPlugin;
 }
