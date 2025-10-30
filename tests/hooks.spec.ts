@@ -1,8 +1,4 @@
-import {
-  executeAfterRenderHooks,
-  executeBeforeRenderHooks,
-  validatePlugin
-} from '../src/hooks';
+import { executeAfterRenderHooks, executeBeforeRenderHooks, validatePlugin } from '../src/hooks';
 import { Plugin } from '../src/types/plugin';
 
 describe('Hooks System', () => {
@@ -30,10 +26,7 @@ describe('Hooks System', () => {
         }
       };
 
-      const result = await executeBeforeRenderHooks('html', {}, [
-        plugin1,
-        plugin2
-      ]);
+      const result = await executeBeforeRenderHooks('html', {}, [plugin1, plugin2]);
 
       expect(result).toBe('html-plugin1-plugin2');
       expect(executionOrder).toEqual(['plugin1', 'plugin2']);
@@ -68,10 +61,7 @@ describe('Hooks System', () => {
         }
       };
 
-      const result = await executeBeforeRenderHooks('html', {}, [
-        plugin1,
-        plugin2
-      ]);
+      const result = await executeBeforeRenderHooks('html', {}, [plugin1, plugin2]);
       expect(result).toBe('html-plugin2');
     });
   });
@@ -156,9 +146,7 @@ describe('Hooks System', () => {
         }
       } as unknown as Plugin;
 
-      expect(() => validatePlugin(plugin)).toThrow(
-        'beforeRender must be a function'
-      );
+      expect(() => validatePlugin(plugin)).toThrow('beforeRender must be a function');
     });
   });
 });
