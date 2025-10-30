@@ -28,7 +28,7 @@ npm install redoc-express-maintained
 
 ## Usage
 
-### Basic Usage
+### Basic Usage (CommonJS)
 
 ```javascript
 const express = require('express');
@@ -50,6 +50,33 @@ app.get(
 
 app.listen(3000);
 ```
+
+### Basic Usage (TypeScript/ESM)
+
+```typescript
+import express, { Express } from 'express';
+import {
+  redocExpressMiddleware,
+  type RedocExpressOptions
+} from 'redoc-express-maintained';
+
+const app: Express = express();
+
+app.get('/docs/swagger.json', (req, res) => {
+  res.sendFile('swagger.json', { root: '.' });
+});
+
+const options: RedocExpressOptions = {
+  title: 'API Documentation',
+  specUrl: '/docs/swagger.json'
+};
+
+app.get('/docs', redocExpressMiddleware(options));
+
+app.listen(3000);
+```
+
+> **TypeScript Users:** Use the named export `redocExpressMiddleware` for better type inference and ESM compatibility.
 
 ### Advanced Configuration
 
@@ -156,6 +183,8 @@ app.get(
 
 #### Creating Custom Plugins
 
+**CommonJS:**
+
 ```javascript
 const { createPlugin } = require('redoc-express-maintained');
 
@@ -177,6 +206,37 @@ const myPlugin = createPlugin({
 app.get(
   '/docs',
   redoc({
+    title: 'API Documentation',
+    specUrl: '/docs/swagger.json',
+    plugins: [myPlugin]
+  })
+);
+```
+
+**TypeScript/ESM:**
+
+```typescript
+import { createPlugin, redocExpressMiddleware } from 'redoc-express-maintained';
+import type { Plugin } from 'redoc-express-maintained';
+
+const myPlugin: Plugin = createPlugin({
+  name: 'my-custom-plugin',
+  version: '1.0.0',
+  hooks: {
+    onRequest: (req, res, next) => {
+      // Custom logic before rendering
+      next();
+    },
+    afterRender: (html) => {
+      // Modify the HTML output
+      return html;
+    }
+  }
+});
+
+app.get(
+  '/docs',
+  redocExpressMiddleware({
     title: 'API Documentation',
     specUrl: '/docs/swagger.json',
     plugins: [myPlugin]
