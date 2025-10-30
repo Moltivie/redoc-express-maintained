@@ -13,6 +13,7 @@ This is a community-maintained fork of [redoc-express](https://github.com/AungMy
 **ReDoc Version:** 2.5.2 (locked for stability - new versions released after testing)
 
 Key improvements:
+
 - ReDoc version locked to prevent unexpected breaking changes
 - Maintained compatibility with current Node.js and Express versions
 - Active issue resolution and community support
@@ -39,10 +40,13 @@ app.get('/docs/swagger.json', (req, res) => {
   res.sendFile('swagger.json', { root: '.' });
 });
 
-app.get('/docs', redoc({
-  title: 'API Documentation',
-  specUrl: '/docs/swagger.json'
-}));
+app.get(
+  '/docs',
+  redoc({
+    title: 'API Documentation',
+    specUrl: '/docs/swagger.json'
+  })
+);
 
 app.listen(3000);
 ```
@@ -50,32 +54,36 @@ app.listen(3000);
 ### Advanced Configuration
 
 ```javascript
-app.get('/docs', redoc({
-  title: 'API Documentation',
-  specUrl: '/docs/swagger.json',
-  nonce: '', // Optional CSP nonce
-  redocOptions: {
-    theme: {
-      colors: {
-        primary: {
-          main: '#6EC5AB'
+app.get(
+  '/docs',
+  redoc({
+    title: 'API Documentation',
+    specUrl: '/docs/swagger.json',
+    nonce: '', // Optional CSP nonce
+    redocOptions: {
+      theme: {
+        colors: {
+          primary: {
+            main: '#6EC5AB'
+          }
+        },
+        typography: {
+          fontFamily:
+            '"museo-sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+          fontSize: '15px',
+          lineHeight: '1.5',
+          code: {
+            code: '#87E8C7',
+            backgroundColor: '#4D4D4E'
+          }
+        },
+        menu: {
+          backgroundColor: '#ffffff'
         }
-      },
-      typography: {
-        fontFamily: '"museo-sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
-        fontSize: '15px',
-        lineHeight: '1.5',
-        code: {
-          code: '#87E8C7',
-          backgroundColor: '#4D4D4E'
-        }
-      },
-      menu: {
-        backgroundColor: '#ffffff'
       }
     }
-  }
-}));
+  })
+);
 ```
 
 For more configuration options, see the [ReDoc documentation](https://redocly.com/docs/api-reference-docs/configuration/functionality/).
@@ -87,52 +95,63 @@ For more configuration options, see the [ReDoc documentation](https://redocly.co
 #### Built-in Plugins
 
 **Authentication Plugin**
+
 ```javascript
 const { authPlugin } = require('redoc-express-maintained');
 
-app.get('/docs', redoc({
-  title: 'API Documentation',
-  specUrl: '/docs/swagger.json',
-  plugins: [
-    authPlugin({
-      type: 'basic',
-      username: 'admin',
-      password: 'secret'
-    })
-  ]
-}));
+app.get(
+  '/docs',
+  redoc({
+    title: 'API Documentation',
+    specUrl: '/docs/swagger.json',
+    plugins: [
+      authPlugin({
+        type: 'bearer',
+        token: 'your-secret-token-here'
+      })
+    ]
+  })
+);
 ```
 
 **Cache Plugin**
+
 ```javascript
 const { cachePlugin } = require('redoc-express-maintained');
 
-app.get('/docs', redoc({
-  title: 'API Documentation',
-  specUrl: '/docs/swagger.json',
-  plugins: [
-    cachePlugin({
-      ttl: 3600, // 1 hour
-      maxSize: 100
-    })
-  ]
-}));
+app.get(
+  '/docs',
+  redoc({
+    title: 'API Documentation',
+    specUrl: '/docs/swagger.json',
+    plugins: [
+      cachePlugin({
+        ttl: 3600, // 1 hour
+        maxSize: 100
+      })
+    ]
+  })
+);
 ```
 
 **Metrics Plugin**
+
 ```javascript
 const { metricsPlugin } = require('redoc-express-maintained');
 
-app.get('/docs', redoc({
-  title: 'API Documentation',
-  specUrl: '/docs/swagger.json',
-  plugins: [
-    metricsPlugin({
-      endpoint: '/docs/metrics',
-      enablePrometheus: true
-    })
-  ]
-}));
+app.get(
+  '/docs',
+  redoc({
+    title: 'API Documentation',
+    specUrl: '/docs/swagger.json',
+    plugins: [
+      metricsPlugin({
+        endpoint: '/docs/metrics',
+        enablePrometheus: true
+      })
+    ]
+  })
+);
 ```
 
 #### Creating Custom Plugins
@@ -155,14 +174,17 @@ const myPlugin = createPlugin({
   }
 });
 
-app.get('/docs', redoc({
-  title: 'API Documentation',
-  specUrl: '/docs/swagger.json',
-  plugins: [myPlugin]
-}));
+app.get(
+  '/docs',
+  redoc({
+    title: 'API Documentation',
+    specUrl: '/docs/swagger.json',
+    plugins: [myPlugin]
+  })
+);
 ```
 
-**📚 For comprehensive plugin documentation, examples, and advanced usage, visit our [Wiki](https://github.com/Moltivie/redoc-express-maintained/wiki)!**
+**For comprehensive plugin documentation, examples, and advanced usage, visit our [Wiki](https://github.com/Moltivie/redoc-express-maintained/wiki)!**
 
 ## Development
 
@@ -186,7 +208,7 @@ npm run build
 
 ## Resources
 
-- [📚 Wiki & Documentation](https://github.com/Moltivie/redoc-express-maintained/wiki) - Complete guides, examples, and API reference
+- [Wiki & Documentation](https://github.com/Moltivie/redoc-express-maintained/wiki) - Complete guides, examples, and API reference
 - [ReDoc Project](https://github.com/Redocly/redoc)
 - [ReDoc Demo](http://redocly.github.io/redoc/)
 - [Original Repository](https://github.com/AungMyoKyaw/redoc-express)
