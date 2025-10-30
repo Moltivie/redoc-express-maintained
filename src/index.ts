@@ -36,17 +36,15 @@ function redocExpressMiddleware(
   }
 
   // Add main rendering middleware
-  middlewares.push(
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      try {
-        res.type('html');
-        const html = await redocHtml(options);
-        res.send(html);
-      } catch (error) {
-        next(error);
-      }
+  middlewares.push(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      res.type('html');
+      const html = await redocHtml(options);
+      res.send(html);
+    } catch (error) {
+      next(error);
     }
-  );
+  });
 
   // Return composed middleware
   if (middlewares.length === 1) {
@@ -85,12 +83,7 @@ export { Plugin } from './types/plugin';
 
 // Re-export all plugins
 export { authPlugin, cachePlugin, metricsPlugin } from './plugins';
-export type {
-  AuthPluginOptions,
-  CachePluginOptions,
-  Metric,
-  MetricsPluginOptions
-} from './plugins';
+export type { AuthPluginOptions, CachePluginOptions, Metric, MetricsPluginOptions } from './plugins';
 
 // Default export
 export default redocExpressMiddleware;
