@@ -1,28 +1,38 @@
 # redoc-express-maintained
 
-Express middleware for serving OpenAPI/Swagger documentation using ReDoc.
+[![npm version][npm-version-src]][npm-version-href]
+[![npm downloads][npm-downloads-src]][npm-downloads-href]
+[![License: MIT][license-src]][license-href]
+[![Code Style: Prettier][prettier-src]][prettier-href]
 
-[![npm][npm-download]][npm-dl-url]
-[![License: MIT][license]][license-url]
-[![code style: prettier][prettier]][prettier-url]
+> **Community-maintained Express middleware for serving OpenAPI/Swagger documentation using ReDoc.**
 
-## About
+This is a maintained fork of `redoc-express`, ensuring compatibility with modern Node.js/Express environments and providing active support.
 
-This is a community-maintained fork of [redoc-express](https://github.com/AungMyoKyaw/redoc-express) by Aung Myo Kyaw. This version addresses compatibility issues and provides ongoing maintenance for modern Node.js and Express environments.
+---
 
-**ReDoc Version:** 2.5.2 (locked for stability - new versions released after testing)
+## 🚀 What's New in v2.0.0
 
-Key improvements:
+We've completely overhauled the package with powerful new features:
 
-- ReDoc version locked to prevent unexpected breaking changes
-- Maintained compatibility with current Node.js and Express versions
-- Active issue resolution and community support
-- Tested releases when upgrading ReDoc versions
-- **NEW:** Extensible plugin system with built-in auth, cache, and metrics plugins
+- **Extensible Plugin System**: Hook into the lifecycle (`beforeRender`, `afterRender`, `onRequest`, `onError`) to customize behavior.
+- **Built-in Plugins**: Ready-to-use plugins for **Authentication**, **Caching**, and **Metrics**.
+- **ts TypeScript Support**: Full type definitions and a new named export `redocExpressMiddleware` for better ESM compatibility.
+- **Improved Stability**: Locked ReDoc version to prevent unexpected breaking changes.
 
-## Install
+---
 
-```shell
+## Key Features
+
+- **Drop-in Replacement**: Works exactly like the original, but better.
+- **Zero Configuration**: Get started with just one line of code.
+- **Highly Customizable**: Configure ReDoc themes, options, and UI.
+- **Production Ready**: Built-in caching and error handling.
+- **Type Safe**: Written in TypeScript with comprehensive type definitions.
+
+## Installation
+
+```bash
 npm install redoc-express-maintained
 ```
 
@@ -36,10 +46,12 @@ const redoc = require('redoc-express-maintained');
 
 const app = express();
 
+// Serve your Swagger/OpenAPI spec
 app.get('/docs/swagger.json', (req, res) => {
   res.sendFile('swagger.json', { root: '.' });
 });
 
+// Serve ReDoc
 app.get(
   '/docs',
   redoc({
@@ -51,7 +63,9 @@ app.get(
 app.listen(3000);
 ```
 
-### Basic Usage (TypeScript/ESM)
+### Usage with TypeScript / ESM
+
+**Recommended for v2+**: Use the named export for better type inference.
 
 ```typescript
 import express, { Express } from 'express';
@@ -61,10 +75,6 @@ import {
 } from 'redoc-express-maintained';
 
 const app: Express = express();
-
-app.get('/docs/swagger.json', (req, res) => {
-  res.sendFile('swagger.json', { root: '.' });
-});
 
 const options: RedocExpressOptions = {
   title: 'API Documentation',
@@ -76,55 +86,14 @@ app.get('/docs', redocExpressMiddleware(options));
 app.listen(3000);
 ```
 
-> **TypeScript Users:** Use the named export `redocExpressMiddleware` for better type inference and ESM compatibility.
+## Plugin System
 
-### Advanced Configuration
+Extend functionality without modifying the core. v2.0 introduces a powerful plugin architecture.
 
-```javascript
-app.get(
-  '/docs',
-  redoc({
-    title: 'API Documentation',
-    specUrl: '/docs/swagger.json',
-    nonce: '', // Optional CSP nonce
-    redocOptions: {
-      theme: {
-        colors: {
-          primary: {
-            main: '#6EC5AB'
-          }
-        },
-        typography: {
-          fontFamily:
-            '"museo-sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
-          fontSize: '15px',
-          lineHeight: '1.5',
-          code: {
-            code: '#87E8C7',
-            backgroundColor: '#4D4D4E'
-          }
-        },
-        menu: {
-          backgroundColor: '#ffffff'
-        }
-      }
-    }
-  })
-);
-```
-
-For more configuration options, see the [ReDoc documentation](https://redocly.com/docs/api-reference-docs/configuration/functionality/).
-
-### Plugin System
-
-**NEW in v2.x:** `redoc-express-maintained` now includes a powerful plugin system to extend functionality!
-
-#### Built-in Plugins
-
-**Authentication Plugin**
+### Using Built-in Plugins
 
 ```javascript
-const { authPlugin } = require('redoc-express-maintained');
+const { authPlugin, cachePlugin } = require('redoc-express-maintained');
 
 app.get(
   '/docs',
@@ -132,160 +101,79 @@ app.get(
     title: 'API Documentation',
     specUrl: '/docs/swagger.json',
     plugins: [
+      // Protect docs with Basic Auth
       authPlugin({
-        type: 'bearer',
-        token: 'your-secret-token-here'
-      })
-    ]
-  })
-);
-```
-
-**Cache Plugin**
-
-```javascript
-const { cachePlugin } = require('redoc-express-maintained');
-
-app.get(
-  '/docs',
-  redoc({
-    title: 'API Documentation',
-    specUrl: '/docs/swagger.json',
-    plugins: [
+        type: 'basic',
+        users: { admin: 'password123' }
+      }),
+      // Cache rendered HTML for 1 hour
       cachePlugin({
-        ttl: 3600, // 1 hour
-        maxSize: 100
+        ttl: 3600
       })
     ]
   })
 );
 ```
 
-**Metrics Plugin**
+### Available Built-in Plugins
 
-```javascript
-const { metricsPlugin } = require('redoc-express-maintained');
+| Plugin      | Description                                                     |
+| ----------- | --------------------------------------------------------------- |
+| **Auth**    | Protect your docs with Basic, Bearer, or Custom authentication. |
+| **Cache**   | Cache rendered HTML to improve performance.                     |
+| **Metrics** | Track documentation usage and performance.                      |
 
-app.get(
-  '/docs',
-  redoc({
-    title: 'API Documentation',
-    specUrl: '/docs/swagger.json',
-    plugins: [
-      metricsPlugin({
-        endpoint: '/docs/metrics',
-        enablePrometheus: true
-      })
-    ]
-  })
-);
-```
+### Creating Custom Plugins
 
-#### Creating Custom Plugins
-
-**CommonJS:**
-
-```javascript
-const { createPlugin } = require('redoc-express-maintained');
-
-const myPlugin = createPlugin({
-  name: 'my-custom-plugin',
-  version: '1.0.0',
-  hooks: {
-    onRequest: (req, res, next) => {
-      // Custom logic before rendering
-      next();
-    },
-    afterRender: (html) => {
-      // Modify the HTML output
-      return html;
-    }
-  }
-});
-
-app.get(
-  '/docs',
-  redoc({
-    title: 'API Documentation',
-    specUrl: '/docs/swagger.json',
-    plugins: [myPlugin]
-  })
-);
-```
-
-**TypeScript/ESM:**
+You can easily create your own plugins to inject scripts, modify HTML, or add logging.
 
 ```typescript
-import { createPlugin, redocExpressMiddleware } from 'redoc-express-maintained';
-import type { Plugin } from 'redoc-express-maintained';
+import { createPlugin } from 'redoc-express-maintained';
 
-const myPlugin: Plugin = createPlugin({
-  name: 'my-custom-plugin',
-  version: '1.0.0',
+const analyticsPlugin = createPlugin({
+  name: 'analytics',
   hooks: {
-    onRequest: (req, res, next) => {
-      // Custom logic before rendering
-      next();
-    },
     afterRender: (html) => {
-      // Modify the HTML output
-      return html;
+      // Inject Google Analytics script
+      return html.replace('</body>', '<script>/* GA Code */</script></body>');
     }
   }
 });
-
-app.get(
-  '/docs',
-  redocExpressMiddleware({
-    title: 'API Documentation',
-    specUrl: '/docs/swagger.json',
-    plugins: [myPlugin]
-  })
-);
 ```
 
-**For comprehensive plugin documentation, examples, and advanced usage, visit our [Wiki](https://github.com/Moltivie/redoc-express-maintained/wiki)!**
+👉 **[Read the full Plugin Documentation on our Wiki](https://github.com/Moltivie/redoc-express-maintained/wiki)**
 
-## Development
+## Configuration Options
 
-Install dependencies:
-
-```shell
-npm install
-```
-
-Run tests:
-
-```shell
-npm test
-```
-
-Build:
-
-```shell
-npm run build
-```
-
-## Resources
-
-- [Wiki & Documentation](https://github.com/Moltivie/redoc-express-maintained/wiki) - Complete guides, examples, and API reference
-- [ReDoc Project](https://github.com/Redocly/redoc)
-- [ReDoc Demo](http://redocly.github.io/redoc/)
-- [Original Repository](https://github.com/AungMyoKyaw/redoc-express)
+| Option         | Type       | Description                                                                                             |
+| -------------- | ---------- | ------------------------------------------------------------------------------------------------------- |
+| `title`        | `string`   | Page title (required).                                                                                  |
+| `specUrl`      | `string`   | URL to your OpenAPI spec (required).                                                                    |
+| `nonce`        | `string`   | Content Security Policy nonce.                                                                          |
+| `redocOptions` | `object`   | [ReDoc configuration object](https://redocly.com/docs/api-reference-docs/configuration/functionality/). |
+| `plugins`      | `Plugin[]` | Array of plugins to apply.                                                                              |
 
 ## Contributing
 
-Contributions are welcome. Please open an issue or submit a pull request on [GitHub](https://github.com/Moltivie/redoc-express-maintained).
+Contributions are welcome! Please see our [Contributing Guide](https://github.com/Moltivie/redoc-express-maintained/blob/main/CONTRIBUTING.md).
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-MIT - See [LICENSE](LICENSE) file for details.
+Distributed under the MIT License. See `LICENSE` for more information.
 
-Original work by [Aung Myo Kyaw](https://github.com/AungMyoKyaw)
+---
 
-[npm-download]: https://img.shields.io/npm/dt/redoc-express-maintained.svg?style=flat-square
-[npm-dl-url]: https://www.npmjs.com/package/redoc-express-maintained
-[license]: https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat-square
-[license-url]: https://opensource.org/licenses/MIT
-[prettier]: https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square
-[prettier-url]: https://github.com/prettier/prettier
+[npm-version-src]: https://img.shields.io/npm/v/redoc-express-maintained?style=flat-square
+[npm-version-href]: https://npmjs.com/package/redoc-express-maintained
+[npm-downloads-src]: https://img.shields.io/npm/dm/redoc-express-maintained?style=flat-square
+[npm-downloads-href]: https://npmjs.com/package/redoc-express-maintained
+[license-src]: https://img.shields.io/badge/license-MIT-blue?style=flat-square
+[license-href]: LICENSE
+[prettier-src]: https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square
+[prettier-href]: https://github.com/prettier/prettier
