@@ -22,6 +22,8 @@ module.exports = {
     'import/no-unresolved': 'off',
     'import/extensions': 'off',
     'import/no-import-module-exports': 'off',
-    'object-curly-newline': 'off'
+    'object-curly-newline': 'off',
+    'implicit-arrow-linebreak': 'off',
+    'max-len': 'off'
   }
 };
