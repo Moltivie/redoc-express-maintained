@@ -17,7 +17,7 @@ We've completely overhauled the package with powerful new features:
 
 - **Extensible Plugin System**: Hook into the lifecycle (`beforeRender`, `afterRender`, `onRequest`, `onError`) to customize behavior.
 - **Built-in Plugins**: Ready-to-use plugins for **Authentication**, **Caching**, and **Metrics**.
-- **ts TypeScript Support**: Full type definitions and a new named export `redocExpressMiddleware` for better ESM compatibility.
+- **Full TypeScript Support**: Full type definitions and a new named export `redocExpressMiddleware` for better ESM compatibility.
 - **Improved Stability**: Locked ReDoc version to prevent unexpected breaking changes.
 
 ---
@@ -148,11 +148,19 @@ const analyticsPlugin = createPlugin({
 Plugins can define an `onError` hook to log, report, or customize error responses. Because Express error handlers run only when you pass an error to `next()`, you must attach the error middleware **after** the ReDoc route. Use the same `plugins` array you pass to the middleware:
 
 ```javascript
-const { redocExpressMiddleware, createOnErrorMiddleware } = require('redoc-express-maintained');
+const {
+  redocExpressMiddleware,
+  createOnErrorMiddleware
+} = require('redoc-express-maintained');
 
-const plugins = [/* your plugins */];
+const plugins = [
+  /* your plugins */
+];
 
-app.get('/docs', redocExpressMiddleware({ title: 'API Docs', specUrl: '/spec.json', plugins }));
+app.get(
+  '/docs',
+  redocExpressMiddleware({ title: 'API Docs', specUrl: '/spec.json', plugins })
+);
 app.use(createOnErrorMiddleware(plugins)); // must come after the ReDoc route
 ```
 
