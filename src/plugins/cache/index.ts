@@ -11,13 +11,13 @@ function stableStringify(obj: unknown): string {
     return JSON.stringify(obj);
   }
   if (Array.isArray(obj)) {
-    return '[' + obj.map(stableStringify).join(',') + ']';
+    return `[${obj.map(stableStringify).join(',')}]`;
   }
   const keys = Object.keys(obj as Record<string, unknown>).sort();
   const pairs = keys.map(
-    (k) => JSON.stringify(k) + ':' + stableStringify((obj as Record<string, unknown>)[k])
+    (k) => `${JSON.stringify(k)}:${stableStringify((obj as Record<string, unknown>)[k])}`
   );
-  return '{' + pairs.join(',') + '}';
+  return `{${pairs.join(',')}}`;
 }
 
 /**
@@ -144,22 +144,22 @@ export function cachePlugin(options: CachePluginOptions = {}): Plugin {
     version: '1.0.0',
     description: 'Caches rendered HTML to improve performance',
     hooks: {
-      afterRender: async (html: string, options?: RedocOptions): Promise<string> => {
+      afterRender: async (html: string, redocOptions?: RedocOptions): Promise<string> => {
         if (!enabled) {
           return html;
         }
 
-        const cacheKey = options != null ? deriveKey(options) : LEGACY_CACHE_KEY;
+        const cacheKey = redocOptions != null ? deriveKey(redocOptions) : LEGACY_CACHE_KEY;
         cache.set(cacheKey, html);
 
         return html;
       },
-      beforeRender: async (html: string, options?: RedocOptions): Promise<string> => {
+      beforeRender: async (html: string, redocOptions?: RedocOptions): Promise<string> => {
         if (!enabled) {
           return html;
         }
 
-        const cacheKey = options != null ? deriveKey(options) : LEGACY_CACHE_KEY;
+        const cacheKey = redocOptions != null ? deriveKey(redocOptions) : LEGACY_CACHE_KEY;
         const cached = cache.get(cacheKey);
 
         if (cached) {

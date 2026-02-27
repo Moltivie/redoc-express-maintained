@@ -69,20 +69,23 @@ describe('Cache Plugin', () => {
     const htmlA = '<html>spec-a</html>';
     const htmlB = '<html>spec-b</html>';
 
-    await plugin.hooks.afterRender!(htmlA, {
+    const { afterRender, beforeRender } = plugin.hooks;
+    if (!afterRender || !beforeRender) throw new Error('hooks expected');
+
+    await afterRender(htmlA, {
       title: 'API A',
       specUrl: '/spec-a.json'
     });
-    await plugin.hooks.afterRender!(htmlB, {
+    await afterRender(htmlB, {
       title: 'API B',
       specUrl: '/spec-b.json'
     });
 
-    const cachedForA = await plugin.hooks.beforeRender!(htmlA, {
+    const cachedForA = await beforeRender(htmlA, {
       title: 'API A',
       specUrl: '/spec-a.json'
     });
-    const cachedForB = await plugin.hooks.beforeRender!(htmlB, {
+    const cachedForB = await beforeRender(htmlB, {
       title: 'API B',
       specUrl: '/spec-b.json'
     });
@@ -96,9 +99,12 @@ describe('Cache Plugin', () => {
 
     const html = '<html>legacy</html>';
 
-    await plugin.hooks.afterRender!(html);
+    const { afterRender, beforeRender } = plugin.hooks;
+    if (!afterRender || !beforeRender) throw new Error('hooks expected');
 
-    const cached = await plugin.hooks.beforeRender!('other', undefined as unknown as object);
+    await afterRender(html);
+
+    const cached = await beforeRender('other', undefined as unknown as object);
     expect(cached).toBe(html);
   });
 

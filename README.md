@@ -88,7 +88,7 @@ app.listen(3000);
 
 ## Plugin System
 
-Extend functionality without modifying the core. v2.0 introduces a powerful plugin architecture.
+Extend functionality without modifying the core. v2.0 introduces a powerful plugin architecture. Plugins are configured **only** via the `plugins` option when creating the middleware—pass an array of plugin instances to enable them for that route.
 
 ### Using Built-in Plugins
 
