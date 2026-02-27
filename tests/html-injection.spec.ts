@@ -10,11 +10,13 @@ describe('HTML Injection Security Tests', () => {
         specUrl: '/spec.json'
       });
 
-      // The script tag should be in the title as text, not as executable code
-      expect(html).toContain(maliciousTitle);
-      // Check that it appears in the title tag
-      expect(html).toContain(`<title>${maliciousTitle}</title>`);
-      // Verify the HTML structure is intact
+      // Title is HTML-escaped so script tags are not executable
+      expect(html).toContain('&lt;script&gt;alert("XSS")&lt;/script&gt;API Docs');
+      expect(html).toContain('<title>');
+      expect(html).toContain('</title>');
+      // Only the two intended script tags (ReDoc bundle + init)
+      const scriptCount = (html.match(/<script/g) || []).length;
+      expect(scriptCount).toBe(2);
       expect(html).toContain('<!DOCTYPE html>');
       expect(html).toContain('</html>');
     });
@@ -26,7 +28,12 @@ describe('HTML Injection Security Tests', () => {
         specUrl: '/spec.json'
       });
 
-      expect(html).toContain(`<title>${title}</title>`);
+      // &, <, > are escaped for HTML context
+      expect(html).toContain('&amp;');
+      expect(html).toContain('&lt;');
+      expect(html).toContain('&gt;');
+      expect(html).toContain('<title>');
+      expect(html).toContain('</title>');
     });
 
     it('should handle title with single quotes', async () => {
@@ -58,11 +65,12 @@ describe('HTML Injection Security Tests', () => {
         specUrl: maliciousUrl
       });
 
-      // Check that the URL is properly placed in the Redoc.init call
-      expect(html).toContain(`"${maliciousUrl}"`);
-      // Verify JavaScript structure is intact
+      // Quotes are backslash-escaped so the JS string does not break
+      expect(html).toContain('\\"');
       expect(html).toContain('Redoc.init(');
       expect(html).toContain('document.getElementById("redoc-container")');
+      // No injected script: init call is intact (no bare "); alert)
+      expect(html).not.toMatch(/"\s*\)\s*;\s*alert/);
     });
 
     it('should handle spec URL with special characters', async () => {
@@ -72,7 +80,7 @@ describe('HTML Injection Security Tests', () => {
         specUrl
       });
 
-      expect(html).toContain(`"${specUrl}"`);
+      expect(html).toContain(specUrl);
     });
 
     it('should handle spec URL with quotes', async () => {
@@ -82,7 +90,10 @@ describe('HTML Injection Security Tests', () => {
         specUrl
       });
 
-      expect(html).toContain(specUrl);
+      // Double quotes in URL are escaped for JS string context
+      expect(html).toContain('\\"');
+      expect(html).toContain('name=');
+      expect(html).toContain('test');
     });
 
     it('should handle spec URL with script tag attempt', async () => {
@@ -92,12 +103,9 @@ describe('HTML Injection Security Tests', () => {
         specUrl
       });
 
-      // URL is inserted as-is in the JSON string
-      // Note: This demonstrates that spec URLs should be validated by the application
-      expect(html).toContain(specUrl);
-      // The template places the URL in a JSON string, which may contain script tags
-      const scriptCount = (html.match(/<script/g) || []).length;
-      expect(scriptCount).toBeGreaterThanOrEqual(2);
+      // </script> in URL is neutralized so our script block is not closed early
+      expect(html).toContain('\\u003c/script>');
+      expect(html).toContain('Redoc.init(');
     });
   });
 
@@ -121,11 +129,11 @@ describe('HTML Injection Security Tests', () => {
         nonce
       });
 
-      // Nonce is inserted as-is in the template
-      // Note: This demonstrates that nonce values should be properly validated
-      expect(html).toContain(`nonce='${nonce}'`);
-      // The malicious nonce can inject attributes
-      expect(html).toContain('onload=');
+      // Single quote is escaped so attribute cannot be broken out of
+      expect(html).toContain('&#39;');
+      expect(html).not.toMatch(/nonce='[^']*'\s+onload=/);
+      const scriptCount = (html.match(/<script/g) || []).length;
+      expect(scriptCount).toBe(2);
     });
 
     it('should handle empty nonce', async () => {
@@ -146,10 +154,11 @@ describe('HTML Injection Security Tests', () => {
         nonce
       });
 
-      // Nonce with script tags can break out of the attribute
-      // Note: This is a security consideration - nonce should be validated
+      // Nonce is escaped so </script> does not close the HTML script tag
+      expect(html).toContain('&lt;');
+      expect(html).toContain('&gt;');
       const scriptCount = (html.match(/<script/g) || []).length;
-      expect(scriptCount).toBeGreaterThan(2);
+      expect(scriptCount).toBe(2);
     });
   });
 
@@ -195,10 +204,21 @@ describe('HTML Injection Security Tests', () => {
         }
       });
 
-      // JSON.stringify escapes quotes but not < and >
-      // The script tags are within a JSON string, so they won't execute
-      expect(html).toContain('"description":"<script>alert(\\"XSS\\")</script>"');
-      // Verify the structure is intact
+      // </script> in options is neutralized so our script block is not closed early
+      expect(html).toContain('\\u003c/script>');
+      expect(html).toContain('Redoc.init(');
+    });
+
+    it('should neutralize </script> in redoc options string values', async () => {
+      const html = await redocHtml({
+        title: 'API Docs',
+        specUrl: '/spec.json',
+        redocOptions: {
+          custom: '</script><script>alert(1)</script>'
+        }
+      });
+
+      expect(html).toContain('\\u003c/script>');
       expect(html).toContain('Redoc.init(');
     });
 
@@ -364,7 +384,7 @@ describe('HTML Injection Security Tests', () => {
         nonce: "'><script>alert(3)</script><'"
       });
 
-      // Verify HTML structure
+      // All injection points are escaped; structure remains valid
       expect(html).toMatch(/^<!DOCTYPE html>/);
       expect(html).toContain('<html>');
       expect(html).toContain('</html>');
@@ -373,15 +393,19 @@ describe('HTML Injection Security Tests', () => {
       expect(html).toContain('<body>');
       expect(html).toContain('</body>');
       expect(html).toContain('<div id="redoc-container"></div>');
+      expect(html).toContain('&lt;'); // title escaped
+      expect(html).toContain('\\"'); // specUrl escaped
+      expect(html).toContain('Redoc.init(');
     });
 
     it('should handle Unicode and international characters', async () => {
+      const title = 'API 文档 📚 Документация';
       const html = await redocHtml({
-        title: 'API 文档 📚 Документация',
+        title,
         specUrl: '/spec.json'
       });
 
-      expect(html).toContain('API 文档 📚 Документация');
+      expect(html).toContain(title);
       expect(html).toContain('<meta charset="utf-8" />');
     });
 
@@ -450,14 +474,14 @@ describe('HTML Injection Security Tests', () => {
         }
       });
 
-      // Verify structure integrity
       expect(html).toContain('<!DOCTYPE html>');
       expect(html).toContain('</html>');
-
-      // Verify all injections are safely contained
-      expect(html).toContain(xssTitle);
-      expect(html).toContain(xssUrl);
-      expect(html).toContain(xssNonce);
+      // All escaped: title as &lt;&gt;, specUrl as \", nonce as &#39;, options as \u003c/script>
+      expect(html).toContain('&lt;script&gt;');
+      expect(html).toContain('\\"');
+      expect(html).toContain('&#39;');
+      expect(html).toContain('\\u003c/script>');
+      expect(html).toContain('Redoc.init(');
     });
 
     it('should handle nested plugin injections', async () => {
@@ -509,10 +533,12 @@ describe('HTML Injection Security Tests', () => {
             specUrl: '/spec.json'
           });
 
-          // Vector should be in the HTML but not executable
-          expect(html).toContain(`<title>${vector}</title>`);
-          // Verify HTML structure remains intact
+          expect(html).toContain('<title>');
+          expect(html).toContain('</title>');
           expect(html).toContain('<!DOCTYPE html>');
+          // Vectors that contain < or > are HTML-escaped
+          if (vector.includes('<')) expect(html).toContain('&lt;');
+          if (vector.includes('>')) expect(html).toContain('&gt;');
           return Promise.resolve();
         })
       );
@@ -521,7 +547,6 @@ describe('HTML Injection Security Tests', () => {
 
   describe('Real-World Security Scenarios', () => {
     it('should handle user-provided spec URL from query parameters safely', async () => {
-      // Simulating: /docs?spec=https://evil.com/malicious.json"><script>alert(1)</script>
       const userProvidedUrl = 'https://evil.com/malicious.json"><script>alert(1)</script>';
 
       const html = await redocHtml({
@@ -529,8 +554,10 @@ describe('HTML Injection Security Tests', () => {
         specUrl: userProvidedUrl
       });
 
-      // URL should be in the JavaScript but not breaking out
-      expect(html).toContain(`"${userProvidedUrl}"`);
+      // Quotes and </script> are escaped so the URL cannot break out
+      expect(html).toContain('\\"');
+      expect(html).toContain('\\u003c/script>');
+      expect(html).toContain('Redoc.init(');
     });
 
     it('should handle custom branding with logo URLs', async () => {

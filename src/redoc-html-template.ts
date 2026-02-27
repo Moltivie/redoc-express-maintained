@@ -1,3 +1,5 @@
+import * as xss from 'xss';
+import { escapeJsString, escapeScriptTagContent } from './escape';
 import { executeAfterRenderHooks, executeBeforeRenderHooks } from './hooks';
 import { Plugin, RedocOptions } from './types/plugin';
 
@@ -44,11 +46,16 @@ async function redocHtml(
 ): Promise<string> {
   const { title, specUrl, nonce = '', redocOptions = {}, plugins = [] } = options;
 
+  const safeTitle = xss.escapeHtml(title.replace(/&/g, '&amp;'));
+  const safeSpecUrl = escapeScriptTagContent(escapeJsString(specUrl));
+  const safeNonce = xss.escapeAttrValue(nonce.replace(/'/g, '&#39;'));
+  const safeOptions = escapeScriptTagContent(JSON.stringify(redocOptions));
+
   let renderedHtml = html
-    .replace('[[title]]', title)
-    .replace('[[spec-url]]', specUrl)
-    .replace('[[nonce]]', nonce)
-    .replace('[[options]]', JSON.stringify(redocOptions));
+    .replace('[[title]]', safeTitle)
+    .replace('[[spec-url]]', safeSpecUrl)
+    .replace('[[nonce]]', safeNonce)
+    .replace('[[options]]', safeOptions);
 
   // Execute beforeRender hooks
   if (plugins.length > 0) {
@@ -74,11 +81,17 @@ function redocHtmlSync(
   }
 ): string {
   const { title, specUrl, nonce = '', redocOptions = {} } = options;
+
+  const safeTitle = xss.escapeHtml(title.replace(/&/g, '&amp;'));
+  const safeSpecUrl = escapeScriptTagContent(escapeJsString(specUrl));
+  const safeNonce = xss.escapeAttrValue(nonce.replace(/'/g, '&#39;'));
+  const safeOptions = escapeScriptTagContent(JSON.stringify(redocOptions));
+
   return html
-    .replace('[[title]]', title)
-    .replace('[[spec-url]]', specUrl)
-    .replace('[[nonce]]', nonce)
-    .replace('[[options]]', JSON.stringify(redocOptions));
+    .replace('[[title]]', safeTitle)
+    .replace('[[spec-url]]', safeSpecUrl)
+    .replace('[[nonce]]', safeNonce)
+    .replace('[[options]]', safeOptions);
 }
 
 export { redocHtml, redocHtmlSync };
