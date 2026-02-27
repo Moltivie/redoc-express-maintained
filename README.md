@@ -143,6 +143,21 @@ const analyticsPlugin = createPlugin({
 
 👉 **[Read the full Plugin Documentation on our Wiki](https://github.com/Moltivie/redoc-express-maintained/wiki)**
 
+### Error handling
+
+Plugins can define an `onError` hook to log, report, or customize error responses. Because Express error handlers run only when you pass an error to `next()`, you must attach the error middleware **after** the ReDoc route. Use the same `plugins` array you pass to the middleware:
+
+```javascript
+const { redocExpressMiddleware, createOnErrorMiddleware } = require('redoc-express-maintained');
+
+const plugins = [/* your plugins */];
+
+app.get('/docs', redocExpressMiddleware({ title: 'API Docs', specUrl: '/spec.json', plugins }));
+app.use(createOnErrorMiddleware(plugins)); // must come after the ReDoc route
+```
+
+In TypeScript/ESM, import `createOnErrorMiddleware` from the package and add `app.use(createOnErrorMiddleware(plugins))` after your ReDoc route so `onError` hooks run when the route calls `next(error)`.
+
 ## Configuration Options
 
 | Option         | Type       | Description                                                                                             |

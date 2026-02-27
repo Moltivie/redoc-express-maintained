@@ -1,5 +1,5 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import { createOnRequestMiddleware } from './hooks';
+import { createOnErrorMiddleware, createOnRequestMiddleware } from './hooks';
 import { createPlugin, createPluginFactory } from './plugin-system';
 import type { Ioption } from './redoc-html-template';
 import { redocHtml } from './redoc-html-template';
@@ -77,6 +77,7 @@ function redocExpressMiddleware(
 }
 
 // Re-export types and utilities for ESM
+export { createOnErrorMiddleware } from './hooks';
 export { createPlugin, createPluginFactory } from './plugin-system';
 export { redocHtml } from './redoc-html-template';
 export { Plugin } from './types/plugin';
@@ -97,6 +98,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = redocExpressMiddleware;
   module.exports.default = redocExpressMiddleware;
   module.exports.redocExpressMiddleware = redocExpressMiddleware;
+  module.exports.createOnErrorMiddleware = createOnErrorMiddleware;
   module.exports.createPlugin = createPlugin;
   module.exports.createPluginFactory = createPluginFactory;
   module.exports.redocHtml = redocHtml;
