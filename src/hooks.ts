@@ -36,15 +36,20 @@ export async function executeBeforeRenderHooks(
  * Executes all afterRender hooks from registered plugins
  * @param html - The HTML string to process
  * @param plugins - Array of plugins to execute
+ * @param options - Optional redoc options (passed to hooks for e.g. cache keying)
  * @returns Modified HTML string
  */
-export async function executeAfterRenderHooks(html: string, plugins: Plugin[]): Promise<string> {
+export async function executeAfterRenderHooks(
+  html: string,
+  plugins: Plugin[],
+  options?: RedocOptions
+): Promise<string> {
   // Process plugins sequentially using reduce to avoid linting issues
   const result = await plugins.reduce(async (previousPromise, plugin) => {
     const currentHtml = await previousPromise;
     if (plugin.hooks.afterRender) {
       try {
-        return await plugin.hooks.afterRender(currentHtml);
+        return await plugin.hooks.afterRender(currentHtml, options);
       } catch (error) {
         // Continue with other plugins even if one fails
         logger.error(`[Plugin: ${plugin.name}] Error in afterRender hook:`, error);

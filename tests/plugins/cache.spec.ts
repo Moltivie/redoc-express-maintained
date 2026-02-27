@@ -63,6 +63,45 @@ describe('Cache Plugin', () => {
     expect(stats).toHaveProperty('ttl');
   });
 
+  it('should use different cache entries for different options', async () => {
+    const plugin = cachePlugin({ ttl: 60, enabled: true });
+
+    const htmlA = '<html>spec-a</html>';
+    const htmlB = '<html>spec-b</html>';
+
+    await plugin.hooks.afterRender!(htmlA, {
+      title: 'API A',
+      specUrl: '/spec-a.json'
+    });
+    await plugin.hooks.afterRender!(htmlB, {
+      title: 'API B',
+      specUrl: '/spec-b.json'
+    });
+
+    const cachedForA = await plugin.hooks.beforeRender!(htmlA, {
+      title: 'API A',
+      specUrl: '/spec-a.json'
+    });
+    const cachedForB = await plugin.hooks.beforeRender!(htmlB, {
+      title: 'API B',
+      specUrl: '/spec-b.json'
+    });
+
+    expect(cachedForA).toBe(htmlA);
+    expect(cachedForB).toBe(htmlB);
+  });
+
+  it('should use legacy key when options are not passed', async () => {
+    const plugin = cachePlugin({ ttl: 60, enabled: true });
+
+    const html = '<html>legacy</html>';
+
+    await plugin.hooks.afterRender!(html);
+
+    const cached = await plugin.hooks.beforeRender!('other', undefined as unknown as object);
+    expect(cached).toBe(html);
+  });
+
   it('should allow clearing cache', () => {
     const plugin = cachePlugin();
 

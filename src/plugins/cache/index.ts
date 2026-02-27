@@ -1,4 +1,33 @@
-import { Plugin } from '../../types/plugin';
+import crypto from 'crypto';
+import { Plugin, RedocOptions } from '../../types/plugin';
+
+const LEGACY_CACHE_KEY = 'redoc-html';
+
+/**
+ * Stable JSON stringify so that key order does not affect the cache key.
+ */
+function stableStringify(obj: unknown): string {
+  if (obj === null || typeof obj !== 'object') {
+    return JSON.stringify(obj);
+  }
+  if (Array.isArray(obj)) {
+    return '[' + obj.map(stableStringify).join(',') + ']';
+  }
+  const keys = Object.keys(obj as Record<string, unknown>).sort();
+  const pairs = keys.map(
+    (k) => JSON.stringify(k) + ':' + stableStringify((obj as Record<string, unknown>)[k])
+  );
+  return '{' + pairs.join(',') + '}';
+}
+
+/**
+ * Derives a deterministic cache key from options that affect the rendered HTML.
+ */
+function deriveKey(options: RedocOptions): string {
+  const { title = '', specUrl = '', nonce = '', redocOptions = {} } = options;
+  const payload = [title, specUrl, nonce, stableStringify(redocOptions)].join('\0');
+  return crypto.createHash('sha256').update(payload, 'utf8').digest('hex').slice(0, 16);
+}
 
 /**
  * Cache plugin configuration options
@@ -115,28 +144,25 @@ export function cachePlugin(options: CachePluginOptions = {}): Plugin {
     version: '1.0.0',
     description: 'Caches rendered HTML to improve performance',
     hooks: {
-      afterRender: async (html: string): Promise<string> => {
+      afterRender: async (html: string, options?: RedocOptions): Promise<string> => {
         if (!enabled) {
           return html;
         }
 
-        // Cache the rendered HTML using a simple key
-        const cacheKey = 'redoc-html';
+        const cacheKey = options != null ? deriveKey(options) : LEGACY_CACHE_KEY;
         cache.set(cacheKey, html);
 
         return html;
       },
-      beforeRender: async (html: string): Promise<string> => {
+      beforeRender: async (html: string, options?: RedocOptions): Promise<string> => {
         if (!enabled) {
           return html;
         }
 
-        // Try to get cached HTML
-        const cacheKey = 'redoc-html';
+        const cacheKey = options != null ? deriveKey(options) : LEGACY_CACHE_KEY;
         const cached = cache.get(cacheKey);
 
         if (cached) {
-          // Return cached version
           return cached;
         }
 

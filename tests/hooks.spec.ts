@@ -106,6 +106,26 @@ describe('Hooks System', () => {
       const result = await executeAfterRenderHooks('html', [plugin1, plugin2]);
       expect(result).toBe('html-after2');
     });
+
+    it('should pass optional options to afterRender hooks when provided', async () => {
+      const receivedOptions: Array<{ title?: string }> = [];
+      const plugin: Plugin = {
+        name: 'options-receiver',
+        hooks: {
+          afterRender: async (html: string, options?: { title?: string }) => {
+            if (options) {
+              receivedOptions.push({ title: options.title });
+            }
+            return html;
+          }
+        }
+      };
+
+      await executeAfterRenderHooks('html', [plugin], { title: 'My API Docs' });
+
+      expect(receivedOptions).toHaveLength(1);
+      expect(receivedOptions[0].title).toBe('My API Docs');
+    });
   });
 
   describe('validatePlugin', () => {

@@ -22,9 +22,10 @@ export type BeforeRenderHook = (html: string, options: RedocOptions) => string |
 /**
  * Hook function that runs after HTML rendering
  * @param html - The final HTML string
+ * @param options - Optional redoc options used for this render (e.g. for cache keying)
  * @returns Modified HTML string or Promise of HTML string
  */
-export type AfterRenderHook = (html: string) => string | Promise<string>;
+export type AfterRenderHook = (html: string, options?: RedocOptions) => string | Promise<string>;
 
 /**
  * Hook function that runs on each request (middleware)

@@ -57,7 +57,7 @@ async function redocHtml(
 
   // Execute afterRender hooks
   if (plugins.length > 0) {
-    renderedHtml = await executeAfterRenderHooks(renderedHtml, plugins);
+    renderedHtml = await executeAfterRenderHooks(renderedHtml, plugins, options as RedocOptions);
   }
 
   return renderedHtml;
