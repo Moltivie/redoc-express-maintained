@@ -11,7 +11,7 @@ This is a maintained fork of `redoc-express`, ensuring compatibility with modern
 
 ---
 
-## 🚀 What's New in v2.0.0
+## 🚀 What's New in v2.1.0
 
 We've completely overhauled the package with powerful new features:
 
