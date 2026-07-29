@@ -11,7 +11,9 @@ describe('HTML Injection Security Tests', () => {
       });
 
       // Title is HTML-escaped so script tags are not executable
-      expect(html).toContain('&lt;script&gt;alert("XSS")&lt;/script&gt;API Docs');
+      expect(html).toContain(
+        '&lt;script&gt;alert("XSS")&lt;/script&gt;API Docs'
+      );
       expect(html).toContain('<title>');
       expect(html).toContain('</title>');
       // Only the two intended script tags (ReDoc bundle + init)
@@ -239,11 +241,13 @@ describe('HTML Injection Security Tests', () => {
 
   describe('Plugin-based HTML Injection', () => {
     it('should allow safe HTML injection via afterRender hook', async () => {
-      const customBanner = '<div class="custom-banner">Welcome to API Docs</div>';
+      const customBanner =
+        '<div class="custom-banner">Welcome to API Docs</div>';
       const plugin = createPlugin({
         name: 'banner',
         hooks: {
-          afterRender: (html: string) => html.replace('<body>', `<body>${customBanner}`)
+          afterRender: (html: string) =>
+            html.replace('<body>', `<body>${customBanner}`)
         }
       });
 
@@ -266,7 +270,8 @@ describe('HTML Injection Security Tests', () => {
       const plugin = createPlugin({
         name: 'analytics',
         hooks: {
-          afterRender: (html: string) => html.replace('</head>', `${analyticsScript}</head>`)
+          afterRender: (html: string) =>
+            html.replace('</head>', `${analyticsScript}</head>`)
         }
       });
 
@@ -289,7 +294,8 @@ describe('HTML Injection Security Tests', () => {
       const plugin = createPlugin({
         name: 'dark-theme',
         hooks: {
-          afterRender: (html: string) => html.replace('</head>', `${customStyles}</head>`)
+          afterRender: (html: string) =>
+            html.replace('</head>', `${customStyles}</head>`)
         }
       });
 
@@ -307,14 +313,16 @@ describe('HTML Injection Security Tests', () => {
       const headerPlugin = createPlugin({
         name: 'header',
         hooks: {
-          afterRender: (html: string) => html.replace('<body>', '<body><header>My Header</header>')
+          afterRender: (html: string) =>
+            html.replace('<body>', '<body><header>My Header</header>')
         }
       });
 
       const footerPlugin = createPlugin({
         name: 'footer',
         hooks: {
-          afterRender: (html: string) => html.replace('</body>', '<footer>My Footer</footer></body>')
+          afterRender: (html: string) =>
+            html.replace('</body>', '<footer>My Footer</footer></body>')
         }
       });
 
@@ -336,7 +344,10 @@ describe('HTML Injection Security Tests', () => {
         name: 'malicious',
         hooks: {
           afterRender: (html: string) =>
-            html.replace('</body>', '<script>alert("This is injected by plugin")</script></body>')
+            html.replace(
+              '</body>',
+              '<script>alert("This is injected by plugin")</script></body>'
+            )
         }
       });
 
@@ -363,7 +374,9 @@ describe('HTML Injection Security Tests', () => {
       // Verify nonce is added to script tags
       expect(html).toContain(`nonce='${nonce}'`);
       // Verify it's in the right script tag
-      expect(html).toMatch(new RegExp(`<script nonce='${nonce}'[^>]*src="https://unpkg.com/redoc`));
+      expect(html).toMatch(
+        new RegExp(`<script nonce='${nonce}'[^>]*src="https://unpkg.com/redoc`)
+      );
     });
 
     it('should work without nonce when not provided', async () => {
@@ -426,7 +439,8 @@ describe('HTML Injection Security Tests', () => {
       const plugin = createPlugin({
         name: 'preprocessor',
         hooks: {
-          beforeRender: (html: string) => html.replace('[[title]]', 'Modified Title')
+          beforeRender: (html: string) =>
+            html.replace('[[title]]', 'Modified Title')
         }
       });
 
@@ -445,7 +459,11 @@ describe('HTML Injection Security Tests', () => {
       const plugin = createPlugin({
         name: 'meta-injector',
         hooks: {
-          beforeRender: (html: string) => html.replace('</head>', '<meta name="author" content="Test Author" /></head>')
+          beforeRender: (html: string) =>
+            html.replace(
+              '</head>',
+              '<meta name="author" content="Test Author" /></head>'
+            )
         }
       });
 
@@ -488,7 +506,8 @@ describe('HTML Injection Security Tests', () => {
       const plugin1 = createPlugin({
         name: 'plugin1',
         hooks: {
-          afterRender: (html: string) => html.replace('<body>', '<body><div id="plugin1">Plugin 1</div>')
+          afterRender: (html: string) =>
+            html.replace('<body>', '<body><div id="plugin1">Plugin 1</div>')
         }
       });
 
@@ -496,7 +515,10 @@ describe('HTML Injection Security Tests', () => {
         name: 'plugin2',
         hooks: {
           afterRender: (html: string) =>
-            html.replace('<div id="plugin1">', '<div id="plugin1"><div id="plugin2">Plugin 2</div>')
+            html.replace(
+              '<div id="plugin1">',
+              '<div id="plugin1"><div id="plugin2">Plugin 2</div>'
+            )
         }
       });
 
@@ -547,7 +569,8 @@ describe('HTML Injection Security Tests', () => {
 
   describe('Real-World Security Scenarios', () => {
     it('should handle user-provided spec URL from query parameters safely', async () => {
-      const userProvidedUrl = 'https://evil.com/malicious.json"><script>alert(1)</script>';
+      const userProvidedUrl =
+        'https://evil.com/malicious.json"><script>alert(1)</script>';
 
       const html = await redocHtml({
         title: 'API Docs',
@@ -568,7 +591,8 @@ describe('HTML Injection Security Tests', () => {
           logoUrl
         },
         hooks: {
-          afterRender: (html: string) => html.replace('<body>', `<body><img src="${logoUrl}" alt="Logo">`)
+          afterRender: (html: string) =>
+            html.replace('<body>', `<body><img src="${logoUrl}" alt="Logo">`)
         }
       });
 

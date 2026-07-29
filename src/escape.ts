@@ -20,7 +20,8 @@ export function escapeJsString(s: string): string {
     const c = out[i];
     const code = c.charCodeAt(0);
     if (code <= 31) {
-      result += code <= 0x0f ? `\\x0${code.toString(16)}` : `\\x${code.toString(16)}`;
+      result +=
+        code <= 0x0f ? `\\x0${code.toString(16)}` : `\\x${code.toString(16)}`;
     } else {
       result += c;
     }

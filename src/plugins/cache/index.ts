@@ -15,7 +15,8 @@ function stableStringify(obj: unknown): string {
   }
   const keys = Object.keys(obj as Record<string, unknown>).sort();
   const pairs = keys.map(
-    (k) => `${JSON.stringify(k)}:${stableStringify((obj as Record<string, unknown>)[k])}`
+    (k) =>
+      `${JSON.stringify(k)}:${stableStringify((obj as Record<string, unknown>)[k])}`
   );
   return `{${pairs.join(',')}}`;
 }
@@ -25,8 +26,14 @@ function stableStringify(obj: unknown): string {
  */
 function deriveKey(options: RedocOptions): string {
   const { title = '', specUrl = '', nonce = '', redocOptions = {} } = options;
-  const payload = [title, specUrl, nonce, stableStringify(redocOptions)].join('\0');
-  return crypto.createHash('sha256').update(payload, 'utf8').digest('hex').slice(0, 16);
+  const payload = [title, specUrl, nonce, stableStringify(redocOptions)].join(
+    '\0'
+  );
+  return crypto
+    .createHash('sha256')
+    .update(payload, 'utf8')
+    .digest('hex')
+    .slice(0, 16);
 }
 
 /**
@@ -45,7 +52,10 @@ export interface CachePluginOptions {
  * Simple in-memory cache implementation
  */
 class HtmlCache {
-  private cache: Map<string, { html: string; timestamp: number; size: number }> = new Map();
+  private cache: Map<
+    string,
+    { html: string; timestamp: number; size: number }
+  > = new Map();
 
   private ttl: number;
 
@@ -144,22 +154,30 @@ export function cachePlugin(options: CachePluginOptions = {}): Plugin {
     version: '1.0.0',
     description: 'Caches rendered HTML to improve performance',
     hooks: {
-      afterRender: async (html: string, redocOptions?: RedocOptions): Promise<string> => {
+      afterRender: async (
+        html: string,
+        redocOptions?: RedocOptions
+      ): Promise<string> => {
         if (!enabled) {
           return html;
         }
 
-        const cacheKey = redocOptions != null ? deriveKey(redocOptions) : LEGACY_CACHE_KEY;
+        const cacheKey =
+          redocOptions != null ? deriveKey(redocOptions) : LEGACY_CACHE_KEY;
         cache.set(cacheKey, html);
 
         return html;
       },
-      beforeRender: async (html: string, redocOptions?: RedocOptions): Promise<string> => {
+      beforeRender: async (
+        html: string,
+        redocOptions?: RedocOptions
+      ): Promise<string> => {
         if (!enabled) {
           return html;
         }
 
-        const cacheKey = redocOptions != null ? deriveKey(redocOptions) : LEGACY_CACHE_KEY;
+        const cacheKey =
+          redocOptions != null ? deriveKey(redocOptions) : LEGACY_CACHE_KEY;
         const cached = cache.get(cacheKey);
 
         if (cached) {

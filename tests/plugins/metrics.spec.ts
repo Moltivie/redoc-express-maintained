@@ -2,7 +2,11 @@ import { NextFunction, Request, Response } from 'express';
 import { Metric, metricsPlugin } from '../../src/plugins/metrics';
 
 // Mock Express Request, Response, and NextFunction
-const createMockRequest = (method = 'GET', url = '/docs', headers: Record<string, string> = {}): Partial<Request> => ({
+const createMockRequest = (
+  method = 'GET',
+  url = '/docs',
+  headers: Record<string, string> = {}
+): Partial<Request> => ({
   method,
   url,
   headers: {
@@ -43,7 +47,8 @@ const createMockResponse = (): Partial<Response> & {
   return res;
 };
 
-const createMockNext = (): jest.Mock<NextFunction> => jest.fn() as jest.Mock<NextFunction>;
+const createMockNext = (): jest.Mock<NextFunction> =>
+  jest.fn() as jest.Mock<NextFunction>;
 
 describe('Metrics Plugin', () => {
   describe('Plugin Configuration', () => {
@@ -52,7 +57,9 @@ describe('Metrics Plugin', () => {
 
       expect(plugin.name).toBe('metrics');
       expect(plugin.version).toBe('1.0.0');
-      expect(plugin.description).toBe('Collects usage metrics for ReDoc documentation');
+      expect(plugin.description).toBe(
+        'Collects usage metrics for ReDoc documentation'
+      );
       expect(plugin.hooks.onRequest).toBeDefined();
       expect(plugin.config).toBeDefined();
     });

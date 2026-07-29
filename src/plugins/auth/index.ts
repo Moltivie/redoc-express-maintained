@@ -24,7 +24,9 @@ export interface AuthPluginOptions {
 /**
  * Parse Basic Authentication header
  */
-function parseBasicAuth(authHeader: string): { username: string; password: string } | null {
+function parseBasicAuth(
+  authHeader: string
+): { username: string; password: string } | null {
   const parts = authHeader.split(' ');
   if (parts.length !== 2 || parts[0] !== 'Basic') {
     return null;
@@ -112,7 +114,11 @@ export function authPlugin(options: AuthPluginOptions = {}): Plugin {
         // Basic authentication
         if (type === 'basic') {
           const credentials = parseBasicAuth(authHeader);
-          if (credentials && credentials.username === username && credentials.password === password) {
+          if (
+            credentials &&
+            credentials.username === username &&
+            credentials.password === password
+          ) {
             next();
           } else {
             sendUnauthorized(res, realm, 'Basic');
