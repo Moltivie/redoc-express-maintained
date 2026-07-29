@@ -20,6 +20,8 @@ We've completely overhauled the package with powerful new features:
 - **Full TypeScript Support**: Full type definitions and a new named export `redocExpressMiddleware` for better ESM compatibility.
 - **Improved Stability**: Locked ReDoc version to prevent unexpected breaking changes.
 
+**v2.1.2** ships ReDoc **2.5.3**, which fixes reported vulnerabilities and a crash on OpenAPI 3.2 specs.
+
 ---
 
 ## Key Features
