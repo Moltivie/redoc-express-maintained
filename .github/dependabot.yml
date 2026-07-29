@@ -1,0 +1,41 @@
+version: 2
+
+updates:
+  # Dev toolchain. This package ships one runtime dependency (xss); everything
+  # else is build/test tooling, so updates are grouped to keep PR noise low.
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: sunday
+    target-branch: dev
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      dev-tooling:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+
+  # Action versions in .github/workflows/. Keeps checkout/setup-node/github-script
+  # current so runner deprecation warnings do not pile up.
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: sunday
+    target-branch: dev
+    labels:
+      - dependencies
+      - github-actions
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns:
+          - '*'
