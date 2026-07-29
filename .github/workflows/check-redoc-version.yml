@@ -23,7 +23,14 @@ jobs:
       - name: Get current ReDoc version
         id: current
         run: |
-          CURRENT=$(grep -oP '@\K[0-9]+\.[0-9]+\.[0-9]+' src/redoc-html-template.ts | head -1)
+          # Single source of truth: the REDOC_VERSION constant in the template module.
+          CURRENT=$(grep -oP "REDOC_VERSION = '\K[0-9]+\.[0-9]+\.[0-9]+" src/redoc-html-template.ts)
+
+          if [ -z "$CURRENT" ]; then
+            echo "::error file=src/redoc-html-template.ts::Could not extract REDOC_VERSION. If the constant was renamed or moved, update this workflow."
+            exit 1
+          fi
+
           echo "version=$CURRENT" >> $GITHUB_OUTPUT
           echo "Current version: $CURRENT"
 
@@ -35,6 +42,12 @@ jobs:
             jq -r '.[]' | \
             grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | \
             sort -V | tail -1)
+
+          if [ -z "$LATEST" ]; then
+            echo "::error::Could not determine the latest stable ReDoc version from npm."
+            exit 1
+          fi
+
           echo "version=$LATEST" >> $GITHUB_OUTPUT
           echo "Latest stable version: $LATEST"
 
@@ -45,10 +58,10 @@ jobs:
           LATEST="${{ steps.latest.outputs.version }}"
 
           if [ "$CURRENT" != "$LATEST" ]; then
-            echo "New stable version available!"
+            echo "New stable version available: $CURRENT -> $LATEST"
             echo "needs_update=true" >> $GITHUB_OUTPUT
           else
-            echo "Already on latest stable version"
+            echo "Already on latest stable version ($CURRENT)"
             echo "needs_update=false" >> $GITHUB_OUTPUT
           fi
 
@@ -59,6 +72,7 @@ jobs:
           script: |
             const current = '${{ steps.current.outputs.version }}';
             const latest = '${{ steps.latest.outputs.version }}';
+            const repoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}`;
 
             // Check if issue already exists
             const issues = await github.rest.issues.listForRepo({
@@ -68,7 +82,7 @@ jobs:
               labels: ['redoc-update']
             });
 
-            const existingIssue = issues.data.find(issue => 
+            const existingIssue = issues.data.find(issue =>
               issue.title.includes(`ReDoc ${latest}`)
             );
 
@@ -85,26 +99,45 @@ jobs:
               labels: ['redoc-update', 'dependencies'],
               body: `A new stable version of ReDoc is available.
 
-            **Current version:** ${current}
-            **Latest stable version:** ${latest}
+            **Current:** ${current} → **Latest stable:** ${latest}
 
-            ## Action Required
+            ## 1. Review before changing anything
 
-            1. Review ReDoc [release notes](https://github.com/Redocly/redoc/releases/tag/v${latest})
-            2. Update version in \`src/redoc-html-template.ts\`
-            3. Update tests in \`tests/redoc-express.spec.ts\`
-            4. Run tests: \`npm test\`
-            5. Build: \`npm run build\`
-            6. Test manually if needed
-            7. Bump package version
-            8. Create release
+            - [ ] Read the [ReDoc ${latest} release notes](https://github.com/Redocly/redoc/releases/tag/v${latest})
+            - [ ] Diff what actually changed: [v${current}...v${latest}](https://github.com/Redocly/redoc/compare/v${current}...v${latest})
+            - [ ] Decide the package bump — ReDoc patch/minor → package **PATCH**; ReDoc major, compatible → **MINOR**; ReDoc major with breaking changes → **MAJOR**
 
-            ## Files to Update
+            ## 2. Make the change
 
-            - [ ] \`src/redoc-html-template.ts\` (line 24)
-            - [ ] \`tests/redoc-express.spec.ts\` (lines 20, 56, 93)
-            - [ ] Run \`npm test\` and \`npm run build\`
-            - [ ] Update \`README.md\` if needed
-            - [ ] Bump version: \`npm version patch\` or \`npm version minor\`
+            The ReDoc version lives in exactly one place:
+
+            - [ ] Bump \`REDOC_VERSION\` in \`src/redoc-html-template.ts\` — one line. The CDN URL is built from it.
+
+            \`tests/redoc-express.spec.ts\` asserts the full rendered HTML and imports \`REDOC_VERSION\`, so it tracks the constant automatically. If it fails after the bump, the constant and the rendered output genuinely disagree — investigate rather than editing the expectation.
+
+            ## 3. Verify
+
+            - [ ] \`npm run lint\`
+            - [ ] \`npm test\`
+            - [ ] \`npm run build\`
+            - [ ] Smoke test in a browser: mount the middleware against a real spec, confirm DevTools → Network loads \`redoc@${latest}\` with a 200, the page renders, and there are no console or CSP errors
+
+            ## 4. Ship
+
+            Branch flow is feature → \`dev\` → \`main\`.
+
+            - [ ] Branch off \`dev\`, commit, open a PR into \`dev\` — CI runs lint/test/build on Node 20/22/24
+            - [ ] Merge the PR, then merge \`dev\` into \`main\`
+            - [ ] On \`main\`: \`npm version patch -m "chore(release): %s"\` (creates the commit and the \`vX.Y.Z\` tag)
+            - [ ] \`git push origin main && git push origin vX.Y.Z\`
+            - [ ] Create the [GitHub release](${repoUrl}/releases/new) for the new tag
+            - [ ] \`npm publish\`
+            - [ ] Merge \`main\` back into \`dev\` so it does not drift behind
+            - [ ] Add the release link here and close this issue
+
+            ## Reference
+
+            - Runbook: \`MAINTENANCE.md\` (local, not committed)
+            - Package releases: ${repoUrl}/releases
             `
             });
