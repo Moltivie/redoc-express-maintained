@@ -2,7 +2,10 @@ import { NextFunction, Request, Response } from 'express';
 import { authPlugin } from '../../src/plugins/auth';
 
 // Mock Express Request, Response, and NextFunction
-const createMockRequest = (authHeader?: string, customHeaders?: Record<string, string>): Partial<Request> => ({
+const createMockRequest = (
+  authHeader?: string,
+  customHeaders?: Record<string, string>
+): Partial<Request> => ({
   headers: {
     authorization: authHeader,
     ...customHeaders
@@ -43,7 +46,8 @@ const createMockResponse = (): Partial<Response> & {
   return res;
 };
 
-const createMockNext = (): jest.Mock<NextFunction> => jest.fn() as jest.Mock<NextFunction>;
+const createMockNext = (): jest.Mock<NextFunction> =>
+  jest.fn() as jest.Mock<NextFunction>;
 
 describe('Auth Plugin', () => {
   describe('Plugin Configuration', () => {
@@ -52,7 +56,9 @@ describe('Auth Plugin', () => {
 
       expect(plugin.name).toBe('auth');
       expect(plugin.version).toBe('1.0.0');
-      expect(plugin.description).toBe('Adds authentication to ReDoc documentation');
+      expect(plugin.description).toBe(
+        'Adds authentication to ReDoc documentation'
+      );
       expect(plugin.hooks.onRequest).toBeDefined();
       expect(plugin.config).toBeDefined();
     });
@@ -108,7 +114,10 @@ describe('Auth Plugin', () => {
       expect(next).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.send).toHaveBeenCalledWith('Unauthorized');
-      expect(res.setHeader).toHaveBeenCalledWith('WWW-Authenticate', 'Basic realm="ReDoc"');
+      expect(res.setHeader).toHaveBeenCalledWith(
+        'WWW-Authenticate',
+        'Basic realm="ReDoc"'
+      );
     });
 
     it('should reject missing auth header for basic auth', () => {
@@ -126,7 +135,10 @@ describe('Auth Plugin', () => {
 
       expect(next).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.setHeader).toHaveBeenCalledWith('WWW-Authenticate', 'Basic realm="ReDoc"');
+      expect(res.setHeader).toHaveBeenCalledWith(
+        'WWW-Authenticate',
+        'Basic realm="ReDoc"'
+      );
     });
 
     it('should reject malformed basic auth header', () => {
@@ -160,7 +172,10 @@ describe('Auth Plugin', () => {
 
       plugin.hooks.onRequest?.(req as Request, res as Response, next);
 
-      expect(res.setHeader).toHaveBeenCalledWith('WWW-Authenticate', 'Basic realm="My API Documentation"');
+      expect(res.setHeader).toHaveBeenCalledWith(
+        'WWW-Authenticate',
+        'Basic realm="My API Documentation"'
+      );
     });
   });
 
@@ -196,7 +211,10 @@ describe('Auth Plugin', () => {
       expect(next).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.send).toHaveBeenCalledWith('Unauthorized');
-      expect(res.setHeader).toHaveBeenCalledWith('WWW-Authenticate', 'Bearer realm="ReDoc"');
+      expect(res.setHeader).toHaveBeenCalledWith(
+        'WWW-Authenticate',
+        'Bearer realm="ReDoc"'
+      );
     });
 
     it('should reject missing bearer token', () => {
@@ -213,7 +231,10 @@ describe('Auth Plugin', () => {
 
       expect(next).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.setHeader).toHaveBeenCalledWith('WWW-Authenticate', 'Bearer realm="ReDoc"');
+      expect(res.setHeader).toHaveBeenCalledWith(
+        'WWW-Authenticate',
+        'Bearer realm="ReDoc"'
+      );
     });
 
     it('should reject malformed bearer token header', () => {
@@ -303,7 +324,10 @@ describe('Auth Plugin', () => {
           expect(customAuth).toHaveBeenCalledWith(req);
           expect(next).not.toHaveBeenCalled();
           expect(res.status).toHaveBeenCalledWith(401);
-          expect(res.setHeader).toHaveBeenCalledWith('WWW-Authenticate', 'Custom realm="ReDoc"');
+          expect(res.setHeader).toHaveBeenCalledWith(
+            'WWW-Authenticate',
+            'Custom realm="ReDoc"'
+          );
           resolve();
         }, 10);
       });

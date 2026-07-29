@@ -34,7 +34,9 @@ describe('escape', () => {
 
   describe('escapeScriptTagContent', () => {
     it('should replace </script> with \\u003c/script>', () => {
-      expect(escapeScriptTagContent('foo</script>bar')).toBe('foo\\u003c/script>bar');
+      expect(escapeScriptTagContent('foo</script>bar')).toBe(
+        'foo\\u003c/script>bar'
+      );
     });
 
     it('should replace case-insensitively', () => {
