@@ -39,9 +39,8 @@ describe('escape', () => {
       );
     });
 
-    it('should replace case-insensitively', () => {
-      // Replacement uses lowercase 'script'; HTML parser no longer sees closing tag
-      expect(escapeScriptTagContent('</SCRIPT>')).toBe('\\u003c/script>');
+    it('should preserve case so the runtime value is unchanged', () => {
+      expect(escapeScriptTagContent('</SCRIPT>')).toBe('\\u003c/SCRIPT>');
     });
 
     it('should replace multiple occurrences', () => {
@@ -50,7 +49,14 @@ describe('escape', () => {
       );
     });
 
-    it('should leave content without </script> unchanged', () => {
+    it.each(['</script >', '</script/x>', '</SCRIPT\t>', '<!--<script>'])(
+      'should neutralize every closing-tag or comment variant: %j',
+      (input) => {
+        expect(escapeScriptTagContent(input)).not.toContain('<');
+      }
+    );
+
+    it('should leave content without < unchanged', () => {
       expect(escapeScriptTagContent('{"key":"value"}')).toBe('{"key":"value"}');
     });
   });

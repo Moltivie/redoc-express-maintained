@@ -20,7 +20,7 @@ We've completely overhauled the package with powerful new features:
 - **Full TypeScript Support**: Full type definitions and a new named export `redocExpressMiddleware` for better ESM compatibility.
 - **Improved Stability**: Locked ReDoc version to prevent unexpected breaking changes.
 
-**v2.1.2** ships ReDoc **2.5.3**, which fixes reported vulnerabilities and a crash on OpenAPI 3.2 specs.
+**v2.1.3** ships ReDoc **2.5.4** (dependency security fixes and accessibility improvements), fixes `nonce` so pages render under a nonce-based CSP (the inline `Redoc.init` script now carries it too), hardens the escaping of `specUrl` and `redocOptions`, and exposes `./package.json` in the exports map.
 
 ---
 
@@ -174,7 +174,7 @@ In TypeScript/ESM, import `createOnErrorMiddleware` from the package and add `ap
 | -------------- | ---------- | ------------------------------------------------------------------------------------------------------- |
 | `title`        | `string`   | Page title (required).                                                                                  |
 | `specUrl`      | `string`   | URL to your OpenAPI spec (required).                                                                    |
-| `nonce`        | `string`   | Content Security Policy nonce.                                                                          |
+| `nonce`        | `string`   | Content Security Policy nonce, applied to both `<script>` tags.                                         |
 | `redocOptions` | `object`   | [ReDoc configuration object](https://redocly.com/docs/api-reference-docs/configuration/functionality/). |
 | `plugins`      | `Plugin[]` | Array of plugins to apply.                                                                              |
 

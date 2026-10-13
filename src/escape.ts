@@ -30,10 +30,11 @@ export function escapeJsString(s: string): string {
 }
 
 /**
- * Neutralizes the literal sequence </script> in content that will be
- * placed inside a <script> block, so the HTML parser does not close
- * the script tag. At runtime the JS value is unchanged (\u003c is <).
+ * Escapes every < in content that will be placed inside a JS string literal
+ * in a <script> block, so the HTML parser can never see a closing tag
+ * (</script>, </script >, </script/x>, any case) or a <!-- comment opener.
+ * At runtime the JS value is unchanged (< is <).
  */
 export function escapeScriptTagContent(s: string): string {
-  return s.replace(/<\/script>/gi, '\\u003c/script>');
+  return s.replace(/</g, '\\u003c');
 }

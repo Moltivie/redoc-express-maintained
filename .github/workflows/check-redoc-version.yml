@@ -32,6 +32,7 @@ jobs:
           fi
 
           echo "version=$CURRENT" >> $GITHUB_OUTPUT
+          echo "git_head=$(npm view "redoc@$CURRENT" gitHead 2>/dev/null)" >> $GITHUB_OUTPUT
           echo "Current version: $CURRENT"
 
       - name: Get latest stable ReDoc version
@@ -49,6 +50,7 @@ jobs:
           fi
 
           echo "version=$LATEST" >> $GITHUB_OUTPUT
+          echo "git_head=$(npm view "redoc@$LATEST" gitHead 2>/dev/null)" >> $GITHUB_OUTPUT
           echo "Latest stable version: $LATEST"
 
       - name: Compare versions
@@ -72,30 +74,39 @@ jobs:
           script: |
             const current = '${{ steps.current.outputs.version }}';
             const latest = '${{ steps.latest.outputs.version }}';
+            const currentSha = '${{ steps.current.outputs.git_head }}';
+            const latestSha = '${{ steps.latest.outputs.git_head }}';
             const repoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}`;
+            const title = `Update ReDoc to version ${latest}`;
 
-            // Check if issue already exists
-            const issues = await github.rest.issues.listForRepo({
+            // Dedupe on the exact title this step creates. Includes closed issues,
+            // so closing one by hand does not get it re-filed the next Sunday.
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
               owner: context.repo.owner,
               repo: context.repo.repo,
-              state: 'open',
-              labels: ['redoc-update']
+              state: 'all',
+              labels: 'redoc-update',
+              per_page: 100
             });
 
-            const existingIssue = issues.data.find(issue =>
-              issue.title.includes(`ReDoc ${latest}`)
-            );
+            const existingIssue = issues.find(issue => !issue.pull_request && issue.title === title);
 
             if (existingIssue) {
-              console.log('Issue already exists:', existingIssue.html_url);
+              console.log(`Issue already exists (${existingIssue.state}):`, existingIssue.html_url);
               return;
             }
+
+            // Redocly does not always tag releases (2.5.4 has no tag), so link the
+            // published commits from npm's gitHead instead of v-tags.
+            const compareUrl = currentSha && latestSha
+              ? `https://github.com/Redocly/redoc/compare/${currentSha}...${latestSha}`
+              : `https://github.com/Redocly/redoc/compare/v${current}...v${latest}`;
 
             // Create new issue
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Update ReDoc to version ${latest}`,
+              title,
               labels: ['redoc-update', 'dependencies'],
               body: `A new stable version of ReDoc is available.
 
@@ -103,8 +114,8 @@ jobs:
 
             ## 1. Review before changing anything
 
-            - [ ] Read the [ReDoc ${latest} release notes](https://github.com/Redocly/redoc/releases/tag/v${latest})
-            - [ ] Diff what actually changed: [v${current}...v${latest}](https://github.com/Redocly/redoc/compare/v${current}...v${latest})
+            - [ ] Read the [ReDoc release notes](https://github.com/Redocly/redoc/releases) — Redocly does not publish one for every version
+            - [ ] Diff what actually changed: [${current}...${latest}](${compareUrl})
             - [ ] Decide the package bump — ReDoc patch/minor → package **PATCH**; ReDoc major, compatible → **MINOR**; ReDoc major with breaking changes → **MAJOR**
 
             ## 2. Make the change

@@ -15,7 +15,7 @@ export interface Ioption {
  * Pinned ReDoc release served from the CDN.
  * Single source of truth - bump here only, tests and CI read it from this constant.
  */
-export const REDOC_VERSION = '2.5.3';
+export const REDOC_VERSION = '2.5.4';
 
 const REDOC_CDN_URL = `https://unpkg.com/redoc@${REDOC_VERSION}/bundles/redoc.standalone.js`;
 
@@ -37,7 +37,7 @@ const html = `<!DOCTYPE html>
     <div id="redoc-container"></div>
     <script nonce='[[nonce]]' src="${REDOC_CDN_URL}"> </script>
   </body>
-  <script>
+  <script nonce='[[nonce]]'>
     Redoc.init(
       "[[spec-url]]",
       [[options]],
@@ -45,6 +45,30 @@ const html = `<!DOCTYPE html>
     );
   </script>
 </html>`;
+
+/**
+ * Fills every placeholder in a single pass. A replacer function is used so
+ * `$&`, `$'` etc. in values are inserted literally, and substituted values are
+ * never rescanned, so a title containing `[[spec-url]]` stays text.
+ */
+function renderTemplate(
+  title: string,
+  specUrl: string,
+  nonce: string,
+  redocOptions: object
+): string {
+  const values: Record<string, string> = {
+    title: xss.escapeHtml(title.replace(/&/g, '&amp;')),
+    'spec-url': escapeScriptTagContent(escapeJsString(specUrl)),
+    nonce: xss.escapeAttrValue(nonce.replace(/'/g, '&#39;')),
+    options: escapeScriptTagContent(JSON.stringify(redocOptions))
+  };
+
+  return html.replace(
+    /\[\[(title|spec-url|nonce|options)\]\]/g,
+    (_, key: string) => values[key]
+  );
+}
 
 async function redocHtml(
   options: Ioption = {
@@ -60,16 +84,7 @@ async function redocHtml(
     plugins = []
   } = options;
 
-  const safeTitle = xss.escapeHtml(title.replace(/&/g, '&amp;'));
-  const safeSpecUrl = escapeScriptTagContent(escapeJsString(specUrl));
-  const safeNonce = xss.escapeAttrValue(nonce.replace(/'/g, '&#39;'));
-  const safeOptions = escapeScriptTagContent(JSON.stringify(redocOptions));
-
-  let renderedHtml = html
-    .replace('[[title]]', safeTitle)
-    .replace('[[spec-url]]', safeSpecUrl)
-    .replace('[[nonce]]', safeNonce)
-    .replace('[[options]]', safeOptions);
+  let renderedHtml = renderTemplate(title, specUrl, nonce, redocOptions);
 
   // Execute beforeRender hooks
   if (plugins.length > 0) {
@@ -104,16 +119,7 @@ function redocHtmlSync(
 ): string {
   const { title, specUrl, nonce = '', redocOptions = {} } = options;
 
-  const safeTitle = xss.escapeHtml(title.replace(/&/g, '&amp;'));
-  const safeSpecUrl = escapeScriptTagContent(escapeJsString(specUrl));
-  const safeNonce = xss.escapeAttrValue(nonce.replace(/'/g, '&#39;'));
-  const safeOptions = escapeScriptTagContent(JSON.stringify(redocOptions));
-
-  return html
-    .replace('[[title]]', safeTitle)
-    .replace('[[spec-url]]', safeSpecUrl)
-    .replace('[[nonce]]', safeNonce)
-    .replace('[[options]]', safeOptions);
+  return renderTemplate(title, specUrl, nonce, redocOptions);
 }
 
 export { redocHtml, redocHtmlSync };
