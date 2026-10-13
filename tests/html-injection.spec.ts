@@ -379,6 +379,21 @@ describe('HTML Injection Security Tests', () => {
       );
     });
 
+    it('should put the nonce on the inline Redoc.init script too', async () => {
+      const nonce = 'random-nonce-12345';
+      const html = await redocHtml({
+        title: 'API Docs',
+        specUrl: '/spec.json',
+        nonce
+      });
+
+      // Every <script> must carry the nonce, otherwise a nonce-based CSP
+      // blocks Redoc.init and the page stays blank.
+      const scriptTags = html.match(/<script\b[^>]*>/g) ?? [];
+      expect(scriptTags).toHaveLength(2);
+      scriptTags.forEach((tag) => expect(tag).toContain(`nonce='${nonce}'`));
+    });
+
     it('should work without nonce when not provided', async () => {
       const html = await redocHtml({
         title: 'API Docs',
@@ -387,6 +402,52 @@ describe('HTML Injection Security Tests', () => {
 
       expect(html).toContain("nonce=''");
     });
+  });
+
+  describe('Placeholder substitution', () => {
+    it('should insert $-patterns in options literally', async () => {
+      const html = await redocHtml({
+        title: 'API Docs',
+        specUrl: "/spec.json?$filter=a$$b$&c$'d$`e",
+        redocOptions: { label: "a$&b$'c$`d$$e" }
+      });
+
+      expect(html).toContain('"/spec.json?$filter=a$$b$&c$\'d$`e"');
+      expect(html).toContain('{"label":"a$&b$\'c$`d$$e"}');
+    });
+
+    it('should not expand placeholders found inside values', async () => {
+      const html = await redocHtml({
+        title: 'Docs [[spec-url]] [[nonce]] [[options]]',
+        specUrl: '/spec.json',
+        nonce: 'n1'
+      });
+
+      expect(html).toContain(
+        '<title>Docs [[spec-url]] [[nonce]] [[options]]</title>'
+      );
+      expect(html).toMatch(/Redoc\.init\(\s*"\/spec\.json"/);
+      expect(html.match(/nonce='n1'/g)).toHaveLength(2);
+    });
+  });
+
+  describe('Script Breakout Prevention', () => {
+    it.each(['</script >', '</script/x>', '</SCRIPT\n>', '<!--<script>'])(
+      'should keep %j in specUrl and options inside the script block',
+      async (payload) => {
+        const html = await redocHtml({
+          title: 'API Docs',
+          specUrl: `/a${payload}<script>alert(1)</script>`,
+          redocOptions: { x: `${payload}<script>alert(2)</script>` }
+        });
+
+        // The template has exactly two <script> elements; any extra opening
+        // or closing tag means a value escaped its JS string.
+        expect(html.match(/<script/gi)).toHaveLength(2);
+        expect(html.match(/<\/script/gi)).toHaveLength(2);
+        expect(html).not.toContain('<!--');
+      }
+    );
   });
 
   describe('HTML Structure Integrity', () => {

@@ -19,7 +19,7 @@ test('should return redocHtml Template', async () => {
     <div id="redoc-container"></div>
     <script nonce='' src="https://unpkg.com/redoc@${REDOC_VERSION}/bundles/redoc.standalone.js"> </script>
   </body>
-  <script>
+  <script nonce=''>
     Redoc.init(
       "http://petstore.swagger.io/v2/swagger.json",
       {},
@@ -55,7 +55,7 @@ test('should return redocHtml Template [nonce]', async () => {
     <div id="redoc-container"></div>
     <script nonce='rAnd0m' src="https://unpkg.com/redoc@${REDOC_VERSION}/bundles/redoc.standalone.js"> </script>
   </body>
-  <script>
+  <script nonce='rAnd0m'>
     Redoc.init(
       "http://petstore.swagger.io/v2/swagger.json",
       {},
@@ -92,7 +92,7 @@ test('should return redocHtml Template [redoc options]', async () => {
     <div id="redoc-container"></div>
     <script nonce='rAnd0m' src="https://unpkg.com/redoc@${REDOC_VERSION}/bundles/redoc.standalone.js"> </script>
   </body>
-  <script>
+  <script nonce='rAnd0m'>
     Redoc.init(
       "http://petstore.swagger.io/v2/swagger.json",
       {"theme":{"colors":{"primary":{"main":"#6EC5AB"}},"typography":{"fontFamily":"\\"museo-sans\\", 'Helvetica Neue', Helvetica, Arial, sans-serif"}}},
