@@ -20,7 +20,7 @@ We've completely overhauled the package with powerful new features:
 - **Full TypeScript Support**: Full type definitions and a new named export `redocExpressMiddleware` for better ESM compatibility.
 - **Improved Stability**: Locked ReDoc version to prevent unexpected breaking changes.
 
-**v2.1.3** ships ReDoc **2.5.4** (dependency security fixes and accessibility improvements), fixes `nonce` so pages render under a nonce-based CSP (the inline `Redoc.init` script now carries it too), hardens the escaping of `specUrl` and `redocOptions`, and exposes `./package.json` in the exports map.
+**v2.1.3** ships ReDoc **2.5.4** (dependency security fixes and accessibility improvements), fixes `nonce` so pages render under a nonce-based CSP (the inline `Redoc.init` script now carries it too), hardens the escaping of `specUrl` and `redocOptions`, and exposes `./package.json` in the exports map. Full changelog in [Releases](https://github.com/Moltivie/redoc-express-maintained/releases).
 
 ---
 
@@ -180,13 +180,13 @@ In TypeScript/ESM, import `createOnErrorMiddleware` from the package and add `ap
 
 ## Contributing
 
-Contributions are welcome! Please see our [Contributing Guide](https://github.com/Moltivie/redoc-express-maintained/blob/main/CONTRIBUTING.md).
+Contributions are welcome! Bug reports and feature requests go in [Issues](https://github.com/Moltivie/redoc-express-maintained/issues).
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+2. Create your feature branch from `dev` (`git checkout -b feature/amazing-feature dev`)
 3. Commit your changes (`git commit -m 'feat: add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+5. Open a Pull Request against `dev` — CI runs lint, tests and build on Node 20, 22 and 24
 
 ## License
 
