@@ -1,6 +1,6 @@
 {
   "name": "redoc-express-maintained",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "Community-maintained fork of redoc-express. Express middleware for OpenAPI/Swagger documentation with compatibility fixes.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
