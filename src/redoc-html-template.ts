@@ -15,7 +15,7 @@ export interface Ioption {
  * Pinned ReDoc release served from the CDN.
  * Single source of truth - bump here only, tests and CI read it from this constant.
  */
-export const REDOC_VERSION = '2.5.3';
+export const REDOC_VERSION = '2.5.4';
 
 const REDOC_CDN_URL = `https://unpkg.com/redoc@${REDOC_VERSION}/bundles/redoc.standalone.js`;
 
