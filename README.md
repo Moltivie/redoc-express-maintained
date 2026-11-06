@@ -11,7 +11,7 @@ This is a maintained fork of `redoc-express`, ensuring compatibility with modern
 
 ---
 
-## 🚀 What's New in v2.1.x
+## 🚀 What's New
 
 We've completely overhauled the package with powerful new features:
 
@@ -20,7 +20,8 @@ We've completely overhauled the package with powerful new features:
 - **Full TypeScript Support**: Full type definitions and a new named export `redocExpressMiddleware` for better ESM compatibility.
 - **Improved Stability**: Locked ReDoc version to prevent unexpected breaking changes.
 
-**v2.1.3** ships ReDoc **2.5.4** (dependency security fixes and accessibility improvements), fixes `nonce` so pages render under a nonce-based CSP (the inline `Redoc.init` script now carries it too), hardens the escaping of `specUrl` and `redocOptions`, and exposes `./package.json` in the exports map. Full changelog in [Releases](https://github.com/Moltivie/redoc-express-maintained/releases).
+**v3.1.0** ships ReDoc **3.1.0**. ReDoc 3 loads as an ES module and initializes through an imported `init` function. See the [ReDoc migration guide](https://redocly.com/docs/redoc/config-migration) when upgrading existing `redocOptions` for removed and renamed configuration options.
+It fixes `nonce` so pages render under a nonce-based CSP (the inline `init` script now carries it too), hardens the escaping of `specUrl` and `redocOptions`, and exposes `./package.json` in the exports map. Full changelog in [Releases](https://github.com/Moltivie/redoc-express-maintained/releases).
 
 ---
 

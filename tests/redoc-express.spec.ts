@@ -17,15 +17,16 @@ test('should return redocHtml Template', async () => {
   </head>
   <body>
     <div id="redoc-container"></div>
-    <script nonce='' src="https://unpkg.com/redoc@${REDOC_VERSION}/bundles/redoc.standalone.js"> </script>
+    <script type="module" nonce=''>
+      import { init } from "https://unpkg.com/redoc@${REDOC_VERSION}/bundles/redoc.standalone.js";
+
+      init(
+        "http://petstore.swagger.io/v2/swagger.json",
+        {},
+        document.getElementById("redoc-container")
+      );
+    </script>
   </body>
-  <script nonce=''>
-    Redoc.init(
-      "http://petstore.swagger.io/v2/swagger.json",
-      {},
-      document.getElementById("redoc-container")
-    );
-  </script>
 </html>`;
 
   expect(
@@ -53,15 +54,16 @@ test('should return redocHtml Template [nonce]', async () => {
   </head>
   <body>
     <div id="redoc-container"></div>
-    <script nonce='rAnd0m' src="https://unpkg.com/redoc@${REDOC_VERSION}/bundles/redoc.standalone.js"> </script>
+    <script type="module" nonce='rAnd0m'>
+      import { init } from "https://unpkg.com/redoc@${REDOC_VERSION}/bundles/redoc.standalone.js";
+
+      init(
+        "http://petstore.swagger.io/v2/swagger.json",
+        {},
+        document.getElementById("redoc-container")
+      );
+    </script>
   </body>
-  <script nonce='rAnd0m'>
-    Redoc.init(
-      "http://petstore.swagger.io/v2/swagger.json",
-      {},
-      document.getElementById("redoc-container")
-    );
-  </script>
 </html>`;
 
   expect(
@@ -90,15 +92,16 @@ test('should return redocHtml Template [redoc options]', async () => {
   </head>
   <body>
     <div id="redoc-container"></div>
-    <script nonce='rAnd0m' src="https://unpkg.com/redoc@${REDOC_VERSION}/bundles/redoc.standalone.js"> </script>
+    <script type="module" nonce='rAnd0m'>
+      import { init } from "https://unpkg.com/redoc@${REDOC_VERSION}/bundles/redoc.standalone.js";
+
+      init(
+        "http://petstore.swagger.io/v2/swagger.json",
+        {"theme":{"colors":{"primary":{"main":"#6EC5AB"}},"typography":{"fontFamily":"\\"museo-sans\\", 'Helvetica Neue', Helvetica, Arial, sans-serif"}}},
+        document.getElementById("redoc-container")
+      );
+    </script>
   </body>
-  <script nonce='rAnd0m'>
-    Redoc.init(
-      "http://petstore.swagger.io/v2/swagger.json",
-      {"theme":{"colors":{"primary":{"main":"#6EC5AB"}},"typography":{"fontFamily":"\\"museo-sans\\", 'Helvetica Neue', Helvetica, Arial, sans-serif"}}},
-      document.getElementById("redoc-container")
-    );
-  </script>
 </html>`;
 
   expect(

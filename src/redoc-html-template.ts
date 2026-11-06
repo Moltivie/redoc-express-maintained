@@ -15,7 +15,7 @@ export interface Ioption {
  * Pinned ReDoc release served from the CDN.
  * Single source of truth - bump here only, tests and CI read it from this constant.
  */
-export const REDOC_VERSION = '2.5.4';
+export const REDOC_VERSION = '3.1.0';
 
 const REDOC_CDN_URL = `https://unpkg.com/redoc@${REDOC_VERSION}/bundles/redoc.standalone.js`;
 
@@ -35,15 +35,16 @@ const html = `<!DOCTYPE html>
   </head>
   <body>
     <div id="redoc-container"></div>
-    <script nonce='[[nonce]]' src="${REDOC_CDN_URL}"> </script>
+    <script type="module" nonce='[[nonce]]'>
+      import { init } from "${REDOC_CDN_URL}";
+
+      init(
+        "[[spec-url]]",
+        [[options]],
+        document.getElementById("redoc-container")
+      );
+    </script>
   </body>
-  <script nonce='[[nonce]]'>
-    Redoc.init(
-      "[[spec-url]]",
-      [[options]],
-      document.getElementById("redoc-container")
-    );
-  </script>
 </html>`;
 
 /**
