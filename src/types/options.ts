@@ -10,7 +10,7 @@ export interface RedocExpressOptions {
   specUrl: string;
   /** Content Security Policy nonce (optional) */
   nonce?: string;
-  /** ReDoc-specific options passed to Redoc.init() */
+  /** ReDoc-specific options passed to the ReDoc init function */
   redocOptions?: Record<string, unknown>;
   /** Array of plugins to use */
   plugins?: Plugin[];

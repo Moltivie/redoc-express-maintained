@@ -16,9 +16,9 @@ describe('HTML Injection Security Tests', () => {
       );
       expect(html).toContain('<title>');
       expect(html).toContain('</title>');
-      // Only the two intended script tags (ReDoc bundle + init)
+      // The module script imports ReDoc and initializes it.
       const scriptCount = (html.match(/<script/g) || []).length;
-      expect(scriptCount).toBe(2);
+      expect(scriptCount).toBe(1);
       expect(html).toContain('<!DOCTYPE html>');
       expect(html).toContain('</html>');
     });
@@ -69,7 +69,7 @@ describe('HTML Injection Security Tests', () => {
 
       // Quotes are backslash-escaped so the JS string does not break
       expect(html).toContain('\\"');
-      expect(html).toContain('Redoc.init(');
+      expect(html).toContain('init(');
       expect(html).toContain('document.getElementById("redoc-container")');
       // No injected script: init call is intact (no bare "); alert)
       expect(html).not.toMatch(/"\s*\)\s*;\s*alert/);
@@ -107,7 +107,7 @@ describe('HTML Injection Security Tests', () => {
 
       // </script> in URL is neutralized so our script block is not closed early
       expect(html).toContain('\\u003c/script>');
-      expect(html).toContain('Redoc.init(');
+      expect(html).toContain('init(');
     });
   });
 
@@ -135,7 +135,7 @@ describe('HTML Injection Security Tests', () => {
       expect(html).toContain('&#39;');
       expect(html).not.toMatch(/nonce='[^']*'\s+onload=/);
       const scriptCount = (html.match(/<script/g) || []).length;
-      expect(scriptCount).toBe(2);
+      expect(scriptCount).toBe(1);
     });
 
     it('should handle empty nonce', async () => {
@@ -160,7 +160,7 @@ describe('HTML Injection Security Tests', () => {
       expect(html).toContain('&lt;');
       expect(html).toContain('&gt;');
       const scriptCount = (html.match(/<script/g) || []).length;
-      expect(scriptCount).toBe(2);
+      expect(scriptCount).toBe(1);
     });
   });
 
@@ -208,7 +208,7 @@ describe('HTML Injection Security Tests', () => {
 
       // </script> in options is neutralized so our script block is not closed early
       expect(html).toContain('\\u003c/script>');
-      expect(html).toContain('Redoc.init(');
+      expect(html).toContain('init(');
     });
 
     it('should neutralize </script> in redoc options string values', async () => {
@@ -221,7 +221,7 @@ describe('HTML Injection Security Tests', () => {
       });
 
       expect(html).toContain('\\u003c/script>');
-      expect(html).toContain('Redoc.init(');
+      expect(html).toContain('init(');
     });
 
     it('should handle redoc options with special characters', async () => {
@@ -375,11 +375,13 @@ describe('HTML Injection Security Tests', () => {
       expect(html).toContain(`nonce='${nonce}'`);
       // Verify it's in the right script tag
       expect(html).toMatch(
-        new RegExp(`<script nonce='${nonce}'[^>]*src="https://unpkg.com/redoc`)
+        new RegExp(
+          `<script type="module" nonce='${nonce}'>\\s*import \\{ init \\} from "https://unpkg.com/redoc`
+        )
       );
     });
 
-    it('should put the nonce on the inline Redoc.init script too', async () => {
+    it('should put the nonce on the ReDoc module script', async () => {
       const nonce = 'random-nonce-12345';
       const html = await redocHtml({
         title: 'API Docs',
@@ -387,10 +389,9 @@ describe('HTML Injection Security Tests', () => {
         nonce
       });
 
-      // Every <script> must carry the nonce, otherwise a nonce-based CSP
-      // blocks Redoc.init and the page stays blank.
+      // A nonce-based CSP must allow the inline module that imports and starts ReDoc.
       const scriptTags = html.match(/<script\b[^>]*>/g) ?? [];
-      expect(scriptTags).toHaveLength(2);
+      expect(scriptTags).toHaveLength(1);
       scriptTags.forEach((tag) => expect(tag).toContain(`nonce='${nonce}'`));
     });
 
@@ -426,8 +427,8 @@ describe('HTML Injection Security Tests', () => {
       expect(html).toContain(
         '<title>Docs [[spec-url]] [[nonce]] [[options]]</title>'
       );
-      expect(html).toMatch(/Redoc\.init\(\s*"\/spec\.json"/);
-      expect(html.match(/nonce='n1'/g)).toHaveLength(2);
+      expect(html).toMatch(/init\(\s*"\/spec\.json"/);
+      expect(html.match(/nonce='n1'/g)).toHaveLength(1);
     });
   });
 
@@ -441,10 +442,10 @@ describe('HTML Injection Security Tests', () => {
           redocOptions: { x: `${payload}<script>alert(2)</script>` }
         });
 
-        // The template has exactly two <script> elements; any extra opening
+        // The template has exactly one <script> element; any extra opening
         // or closing tag means a value escaped its JS string.
-        expect(html.match(/<script/gi)).toHaveLength(2);
-        expect(html.match(/<\/script/gi)).toHaveLength(2);
+        expect(html.match(/<script/gi)).toHaveLength(1);
+        expect(html.match(/<\/script/gi)).toHaveLength(1);
         expect(html).not.toContain('<!--');
       }
     );
@@ -469,7 +470,7 @@ describe('HTML Injection Security Tests', () => {
       expect(html).toContain('<div id="redoc-container"></div>');
       expect(html).toContain('&lt;'); // title escaped
       expect(html).toContain('\\"'); // specUrl escaped
-      expect(html).toContain('Redoc.init(');
+      expect(html).toContain('init(');
     });
 
     it('should handle Unicode and international characters', async () => {
@@ -560,7 +561,7 @@ describe('HTML Injection Security Tests', () => {
       expect(html).toContain('\\"');
       expect(html).toContain('&#39;');
       expect(html).toContain('\\u003c/script>');
-      expect(html).toContain('Redoc.init(');
+      expect(html).toContain('init(');
     });
 
     it('should handle nested plugin injections', async () => {
@@ -641,7 +642,7 @@ describe('HTML Injection Security Tests', () => {
       // Quotes and </script> are escaped so the URL cannot break out
       expect(html).toContain('\\"');
       expect(html).toContain('\\u003c/script>');
-      expect(html).toContain('Redoc.init(');
+      expect(html).toContain('init(');
     });
 
     it('should handle custom branding with logo URLs', async () => {
